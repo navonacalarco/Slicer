@@ -1,0 +1,120 @@
+Navona:
+
+	Regions_Subjects_Files_Nested is AppendClusters, with the
+	subject directories nested inside of the region tol-level
+	directories. Try running wm_quality_control_tractography.py on
+	first the region directories, to see if it would find the
+	subject dirs and do something with them, and if that failed,
+	you meant to run it on the individual subject directories.
+
+	Region_Subjectfile_Flattened is AppendClusters, with three top
+	level region directories, and NO subject directories, but rather
+	all files have the subject ID prefixed to them, with the intent
+	to run wm_quality_control_tractography.py on the region dirs to
+	see how it accumultes them all together.
+
+To generate these directories, I used the following command line:
+
+find $PWD -type f | \
+    while read line
+    do sub=`echo $line | cut -d '_' -f 3 | cut -d '/' -f 1` # The subject ID, like sub-CMH0001
+       name=`basename $line | sed "s/^/${sub}-/"` # The name of the file, optionally you can remove the ‘sed’ part,
+                                                  # which just adds the sub ID to the front of the filename
+       region=`echo $line | cut -d '/' -f 11` # The region name
+       ( ... various_things_which_depend_on_the_above_names ... )
+       # in the above parentheses, stick any commands you want, like
+       # mkdir -vp ../${region}/${sub}/; cp -vn ../${region}/${sub}/${name}
+       # the point is that you can use these three components to renest
+       # and rename the files and directories in various combinations!
+    done
+
+By the way, THIS is the list of all the syntax and
+style errors in wm_quality_control_tractography.py,
+according to elpy/flymake (emacs' automated python
+code tester):
+
+    2   0 :error   E265 block comment should start with '# '
+   14   0 :error   E722 do not use bare 'except'
+   15  10 :error   E999 SyntaxError: invalid syntax
+   21   0 :error   E722 do not use bare 'except'
+   22  79 :error   E501 line too long (113 > 79 characters)
+   23  16 :warning W291 trailing whitespace
+   25   0 :error   E265 block comment should start with '# '
+   27   0 :error   E265 block comment should start with '# '
+   29  79 :error   E501 line too long (142 > 79 characters)
+   30  79 :error   E501 line too long (274 > 79 characters)
+   35  79 :error   E501 line too long (82 > 79 characters)
+   38  79 :error   E501 line too long (123 > 79 characters)
+   39  79 :error   E501 line too long (83 > 79 characters)
+   40   0 :error   E265 block comment should start with '# '
+   43   0 :warning W293 blank line contains whitespace
+   49  79 :error   E501 line too long (85 > 79 characters)
+   54  79 :error   E501 line too long (83 > 79 characters)
+   59  79 :error   E501 line too long (105 > 79 characters)
+   62  79 :error   E501 line too long (97 > 79 characters)
+   65  79 :error   E501 line too long (169 > 79 characters)
+   66  79 :error   E501 line too long (104 > 79 characters)
+   84   9 :error   E222 multiple spaces after operator
+   84  27 :error   E221 multiple spaces before operator
+   86   9 :error   E222 multiple spaces after operator
+   96  79 :error   E501 line too long (90 > 79 characters)
+   97  79 :error   E501 line too long (94 > 79 characters)
+   98  79 :error   E501 line too long (104 > 79 characters)
+   99  79 :error   E501 line too long (99 > 79 characters)
+  100  79 :error   E501 line too long (99 > 79 characters)
+  101  79 :error   E501 line too long (95 > 79 characters)
+  103  79 :error   E501 line too long (103 > 79 characters)
+  121  79 :error   E501 line too long (84 > 79 characters)
+  132  79 :error   E501 line too long (119 > 79 characters)
+  133  79 :error   E501 line too long (95 > 79 characters)
+  134  79 :error   E501 line too long (87 > 79 characters)
+  142  79 :error   E501 line too long (80 > 79 characters)
+  152  79 :error   E501 line too long (121 > 79 characters)
+  153  79 :error   E501 line too long (87 > 79 characters)
+  161  79 :error   E501 line too long (94 > 79 characters)
+  167  57 :warning W291 trailing whitespace
+  186  79 :error   E501 line too long (94 > 79 characters)
+  188   0 :warning W293 blank line contains whitespace
+  197  79 :error   E501 line too long (101 > 79 characters)
+  203  79 :error   E501 line too long (80 > 79 characters)
+  216  14 :error   E225 missing whitespace around operator
+  216  79 :error   E501 line too long (129 > 79 characters)
+  217  14 :error   E225 missing whitespace around operator
+  224  79 :error   E501 line too long (86 > 79 characters)
+  225  79 :error   E501 line too long (96 > 79 characters)
+  229   8 :error   E265 block comment should start with '# '
+  229  79 :error   E501 line too long (130 > 79 characters)
+  230   8 :error   E265 block comment should start with '# '
+  231   8 :error   E265 block comment should start with '# '
+  231  79 :error   E501 line too long (94 > 79 characters)
+  232   8 :error   E265 block comment should start with '# '
+  233   8 :error   E265 block comment should start with '# '
+  235  14 :error   E225 missing whitespace around operator
+  235  79 :error   E501 line too long (130 > 79 characters)
+  236  14 :error   E225 missing whitespace around operator
+  242  79 :error   E501 line too long (95 > 79 characters)
+  245  30 :error   E222 multiple spaces after operator
+  261  30 :error   E222 multiple spaces after operator
+  266   0 :warning W293 blank line contains whitespace
+  267  38 :warning W291 trailing whitespace
+  280  23 :error   E231 missing whitespace after ','
+  280  25 :error   E231 missing whitespace after ','
+  280  27 :error   E231 missing whitespace after ','
+  282  79 :error   E501 line too long (96 > 79 characters)
+  283  79 :error   E501 line too long (111 > 79 characters)
+  285  79 :error   E501 line too long (130 > 79 characters)
+  288  79 :error   E501 line too long (84 > 79 characters)
+  302  30 :error   E222 multiple spaces after operator
+  306  73 :warning W291 trailing whitespace
+  309  79 :error   E501 line too long (118 > 79 characters)
+  311  71 :warning W291 trailing whitespace
+  314  79 :error   E501 line too long (117 > 79 characters)
+  314  96 :error   E225 missing whitespace around operator
+  314 100 :error   E221 multiple spaces before operator
+  330  79 :error   E501 line too long (92 > 79 characters)
+  331  79 :error   E501 line too long (107 > 79 characters)
+  334  79 :error   E501 line too long (126 > 79 characters)
+  335   4 :error   E722 do not use bare 'except'
+  336  79 :error   E501 line too long (124 > 79 characters)
+
+78 syntax errors, 8 style warnings! No wonder it's so dwanky!

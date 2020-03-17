@@ -1,0 +1,28 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#read in data
+`df_eddy` <- read.table("/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasEddy.txt", quote="\"", comment.char="")
+`df_brainsuite` <- read.table("/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasBrainsuite.txt", quote="\"", comment.char="")
+
+#cut out subject ID
+df_eddy$V2 <- substr(df_eddy$V1, 57, 67) #475
+df_brainsuite$V2 <- substr(df_brainsuite$V1, 57, 67) #475
+
+#find out which participants are different between dfs
+df_eddy$V2[which(df_eddy$V2 %in% df_brainsuite$V2 == FALSE)] #NONE
+
+#look at participants with data
+`df_data` <- read.table("/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasData.txt", quote="\"", comment.char="") #463
+
+#find out which participants with folders don't have brainsuite
+df_brainsuite$V2 <- as.character(df_brainsuite$V2)
+df_data$V1 <- as.character(df_data$V1)
+df_data$V1[which(df_data$V1 %in% df_brainsuite$V2 == FALSE)] #NONE
+
+#check length of unique IDs
+length(unique(df_brainsuite$V2))
+
+
