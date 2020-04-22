@@ -22,8 +22,10 @@
 
 #The files we ultimately want for supplementary steps are in /projects/ncalarco/thesis/SPINS/Slicer/data/registered/FiberMeasurements/
 #Read documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
-#Submit with sbatch
+#Also, see tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
+#Note that there are QC steps for each of these major 6 steps. See https://github.com/navonacalarco/Slicer/master/10_qualityControl.sh
 
+#Submit with sbatch
 cd $SLURM_SUBMIT_DIR
 
 sublist="/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/03_sublist.txt"
@@ -50,8 +52,8 @@ declare -a listHemispheres=("tracts_commissural" "tracts_left_hemisphere" "tract
 
 mkdir -p $outputfolder
 
-#creates RegisterToAtlas
-#this step register each subject to the ORG800 atlas
+#STEP 1 OF 6: creates RegisterToAtlas
+#this step registers each subject to the ORG800 atlas
 if [ ! -e $outputfolder/RegisterToAtlas/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
 wm_register_to_atlas_new.py \
   $inputfolder $atlas $outputfolder/RegisterToAtlas
@@ -59,7 +61,7 @@ else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
 fi
 
-#creates ClusterFromAtlas
+#STEP 2 OF 6: creates ClusterFromAtlas
 #then, create clusters - these are .vtp files of each of the n=800 clusters, for each participants
 if [ ! -e $outputfolder/ClusterFromAtlas/${subject}'_reg' ]; then
 wm_cluster_from_atlas.py \
@@ -70,7 +72,7 @@ else
   echo "wm_cluster_from_atlas_new.py was already run on this subject!"
 fi
 
-#creates OutliersPerSubject
+#STEP 3 OF 6: creates OutliersPerSubject
 #create a version without any outliers -- this is the same as above (.vtp for n=800), but without outliers
 if [ ! -e $outputfolder/OutliersPerSubject/${subject}'_reg_outlier_removed' ]; then
 wm_cluster_remove_outliers.py \
@@ -82,7 +84,7 @@ else
   echo "wm_cluster_remove_outliers.py was already run on this subject!"
 fi
 
-#creates ClusterByHemisphere
+#STEP 4 OF 6:creates ClusterByHemisphere
 #creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural, even if shouldn't exist, i.e., creates a 'left hemisphere' .vtp for commissural tracts)
 if [ ! -e $outputfolder/ClusterByHemisphere/'OutliersPerSubject_'${subject} ]; then
 wm_separate_clusters_by_hemisphere.py \
@@ -93,7 +95,7 @@ else
   echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
 fi
 
-#creates AppendClusters
+#STEP 5 OF 6: creates AppendClusters
 #combines the n=800 fiber bundles into the n=41 named tracts -- again, by hemisphere
 if [ ! -e $outputfolder/AppendClusters/'OutliersPerSubject_'${subject} ]; then
 for hemisphere in "${listHemispheres[@]}"; do
@@ -110,7 +112,7 @@ else
   echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
 fi
 
-#creates FiberMeausrements
+#STEP 6 OF 6:creates FiberMeasurements
 #this step creates a csv file, again per hemisphere, with key metrics per n=41 named tracts, for each participant
 if [ ! -e $outputfolder/FiberMeasurements/${subject} ]; then
 for hemisphere in "${listHemispheres[@]}"; do
