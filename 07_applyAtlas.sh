@@ -109,7 +109,7 @@ wm_append_clusters.py \
 done < $tractsfile
 done
 else
-  echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
+  echo "wm_append_clusters.py was already run on this subject!"
 fi
 
 #STEP 6 OF 6:creates FiberMeasurements
