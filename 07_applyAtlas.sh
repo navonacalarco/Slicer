@@ -50,7 +50,8 @@ declare -a listHemispheres=("tracts_commissural" "tracts_left_hemisphere" "tract
 
 mkdir -p $outputfolder
 
-#first, register each subject to atlas
+#creates RegisterToAtlas
+#this step register each subject to the ORG800 atlas
 if [ ! -e $outputfolder/RegisterToAtlas/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
 wm_register_to_atlas_new.py \
   $inputfolder $atlas $outputfolder/RegisterToAtlas
@@ -58,7 +59,8 @@ else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
 fi
 
-#then, create clusters
+#creates ClusterFromAtlas
+#then, create clusters - these are .vtp files of each of the n=800 clusters, for each participants
 if [ ! -e $outputfolder/ClusterFromAtlas/${subject}'_reg' ]; then
 wm_cluster_from_atlas.py \
   -l 20 \
@@ -68,7 +70,8 @@ else
   echo "wm_cluster_from_atlas_new.py was already run on this subject!"
 fi
 
-#create a version without any outliers
+#creates OutliersPerSubject
+#create a version without any outliers -- this is the same as above (.vtp for n=800), but without outliers
 if [ ! -e $outputfolder/OutliersPerSubject/${subject}'_reg_outlier_removed' ]; then
 wm_cluster_remove_outliers.py \
   -cluster_outlier_std 4 \
@@ -79,7 +82,8 @@ else
   echo "wm_cluster_remove_outliers.py was already run on this subject!"
 fi
 
-#Cluster by hemisphere -- something Slicer requires
+#creates ClusterByHemisphere
+#creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural, even if shouldn't exist, i.e., creates a 'left hemisphere' .vtp for commissural tracts)
 if [ ! -e $outputfolder/ClusterByHemisphere/'OutliersPerSubject_'${subject} ]; then
 wm_separate_clusters_by_hemisphere.py \
   -atlasMRML $clusteredmrml \
@@ -89,7 +93,8 @@ else
   echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
 fi
 
-#Append clusters
+#creates AppendClusters
+#combines the n=800 fiber bundles into the n=41 named tracts -- again, by hemisphere
 if [ ! -e $outputfolder/AppendClusters/'OutliersPerSubject_'${subject} ]; then
 for hemisphere in "${listHemispheres[@]}"; do
 echo $hemisphere
@@ -105,7 +110,8 @@ else
   echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
 fi
 
-#Run fibre measurements per participant
+#creates FiberMeausrements
+#this step creates a csv file, again per hemisphere, with key metrics per n=41 named tracts, for each participant
 if [ ! -e $outputfolder/FiberMeasurements/${subject} ]; then
 for hemisphere in "${listHemispheres[@]}"; do
 echo $hemisphere
