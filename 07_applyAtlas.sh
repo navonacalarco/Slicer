@@ -54,8 +54,10 @@ mkdir -p $outputfolder
 
 #STEP 1 OF 6: creates RegisterToAtlas
 #this step registers each subject to the ORG800 atlas
+#note: we are using rigid-affine registration (cf. affine + nonrigid)
+#note: the .tfm file is the transform matrix
 if [ ! -e $outputfolder/RegisterToAtlas/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
-wm_register_to_atlas_new.py \
+wm_register_to_atlas_new.py -mode rigid_affine_fast \
   $inputfolder $atlas $outputfolder/RegisterToAtlas
 else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
@@ -63,9 +65,9 @@ fi
 
 #STEP 2 OF 6: creates ClusterFromAtlas
 #then, create clusters - these are .vtp files of each of the n=800 clusters, for each participants
+#note: previously had flag for `-l 20`
 if [ ! -e $outputfolder/ClusterFromAtlas/${subject}'_reg' ]; then
 wm_cluster_from_atlas.py \
-  -l 20 \
   $outputfolder/RegisterToAtlas/${subject}_eddy_fixed_SlicerTractography/output_tractography/${subject}'_eddy_fixed_SlicerTractography_reg.vtk' \
   $atlasDirectory $outputfolder/ClusterFromAtlas
 else
