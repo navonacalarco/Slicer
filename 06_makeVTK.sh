@@ -50,19 +50,23 @@ Slicer --launch DWIToDTIEstimation \
   ${output_name}_SCALAR.nrrd
 
 #volume masking
-Slicer --launch DiffusionWeightedVolumeMasking \
-  --removeislands \
-  ${inputimage} \
-  ${output_name}_SCALAR.nrrd \
-  ${output_name}_MASK.nrrd
+#Slicer --launch DiffusionWeightedVolumeMasking \
+#  --removeislands \
+#  ${inputimage} \
+#  ${output_name}_SCALAR.nrrd \
+#  ${output_name}_MASK.nrrd
+# NOTE: We have decided to use masking created by Michael in Brainsuite, instead of native Slicer process
 
 #label map seeding
 Slicer --launch TractographyLabelMapSeeding \
 ${output_name}_DTI.nrrd \
 ${output_name}_SlicerTractography.vtk \
-  --inputroi ${output_name}_MASK.nrrd \
+  #--inputroi ${output_name}_MASK.nrrd \  
+  --inputroi ${output_name}_mask.nrrd
   --useindexspace \
   --stoppingvalue 0.10
+#note: need to update inputroi with new mask made outside of Slicer
+#note: these new masks need to be converted to .nrrd
 
 #one this script has run, for ease, move over just the tractography files to a separate atlasDirectory
 #mkdir /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly
