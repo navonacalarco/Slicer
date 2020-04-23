@@ -17,9 +17,9 @@ mkdir -p $output_dir
 
 while read id; do
 echo ${id}
-if [ ! -e ${output_dir}/${id}/${id}_eddy_fixed.nrrd ]; then
+if [ ! -e ${output_dir}/${id}_eddy_fixed.nrrd ]; then
 
-DWIConvert --inputVolume ${input_dir_dwi}/${id}/${id}_eddy_fixed.nii.gz \
+DWIConvert --inputVolume ${input_dir_dwi}/${id}_eddy_fixed.nii.gz \
    --conversionMode FSLToNrrd \
    --inputBValues ${data_dir}/${id}/*/dwi/${id}_*desc-eddy_dwi.bval \
    --inputBVectors ${data_dir}/${id}/*/dwi/${id}_*desc-eddy_dwi.bvec \
