@@ -11,15 +11,14 @@ from glob import glob
 #Notes to self:
 #If running in the terminal, module load Python 3+, and then run in ipython
 #If getting errors about indents, may be because Python doesn't like spaces in the terminal
-#Because of difficulties installing dependencies in my own Python environement, I will use the lab's Python to run the below
+#Because of difficulties installing dependencies in my own Python environment, I will use the lab's Python 
 #This code takes a bit of time to run -- about 6 seconds per participant -- so about an hour for SPINS 
-#For some reason, this didn't respect the sublist -- it included participants (e.g.. human phantoms), who were on that list (ignoring that problem for now; will remove later).
 
 #module load python/3.8.1
 #ipython
 
 #make the directory for the output
-#mkdir /projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT
+mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT
 
 input_dir   = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
 output_dir  = "/projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT"
