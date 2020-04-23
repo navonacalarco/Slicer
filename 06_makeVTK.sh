@@ -1,18 +1,17 @@
 #!/bin/bash -l
 
 ####################################################################################
-#Name: 06_makeVTK.sh
+#Name:         06_makeVTK.sh
 
 #Last updated: 2020-04-22
 
-#Description: Fits a tensor, makes a mask, and performs tractography
+#Description:  Fits a tensor, makes a mask, and performs tractography
 
-#Submission: sbatch
+#Submission:   sbatch
 
 #Notes: 
-   #For sbatch, remember to change the array to reflect number of participants
-   #These commands are part of SlicerDMRI proper (cf. white matter analysis) 
-
+               #For sbatch, remember to change the array to reflect number of participants
+               #These commands are part of SlicerDMRI proper (cf. white matter analysis) 
 ####################################################################################
 
 #SBATCH --partition=high-moby
@@ -105,7 +104,8 @@ Slicer --launch TractographyLabelMapSeeding \
 #thresholdmode: FA                  Tensor measurement used to start and stop the tractography
 #stopping curvature: .7             Tractography will stop if radius of curvature becomes smaller than this number units are degrees per mm
 #integration step length: .5        Distance between points on the same fiber in mm
-  
+
+####################################################################################
   
 #once this script has run, for ease, move over just the tractography files to a separate (flat) directory
 mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly
