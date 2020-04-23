@@ -47,7 +47,11 @@ declare -a listHemispheres=("tracts_commissural" "tracts_left_hemisphere" "tract
 
 mkdir -p $outputfolder
 
-#STEP 1 OF 6: creates 01_TractRegistration (formerly RegisterToAtlas)
+##############
+#STEP 1 OF 8
+##############
+
+#creates 01_TractRegistration (formerly RegisterToAtlas)
 #this step registers each subject to the ORG800 atlas
 #note: we are using rigid-affine registration (cf. affine + nonrigid)
 #note: the .tfm file is the transform matrix
@@ -60,7 +64,11 @@ else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
 fi
 
-#STEP 2 OF 6: creates FiberClustering/InitialClusters/ (formerly ClusterFromAtlas)
+##############
+#STEP 2 OF 8
+##############
+
+#creates FiberClustering/InitialClusters/ (formerly ClusterFromAtlas)
 #then, create clusters - these are .vtp files of each of the n=800 clusters, for each participants
 #note: previously had flag for `-l 20`
 if [ ! -e $outputfolder/02_FiberClustering/InitialClusters/${subject}'_reg' ]; then
@@ -72,7 +80,11 @@ else
   echo "wm_cluster_from_atlas_new.py was already run on this subject!"
 fi
 
-#STEP 3 OF 6: creates FiberClustering/OutlierRemovedClusters/ (formerly OutliersPerSubject)
+##############
+#STEP 3 OF 8
+##############
+
+#creates FiberClustering/OutlierRemovedClusters/ (formerly OutliersPerSubject)
 #create a version without any outliers -- this is the same as above (.vtp for n=800), but without outliers
 #note: we are removing outliers at the 4SD threshold
 if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' ]; then
@@ -85,7 +97,11 @@ else
   echo "wm_cluster_remove_outliers.py was already run on this subject!"
 fi
 
-#NEW STEP: check cluster location 
+##############
+#STEP 4 OF 8
+##############
+
+#check cluster location 
 #this script assess the hemispheric location (left, right or commissural) of each fiber in each fiber cluster
 #each cluster (the vtp file) is updated by adding additional information about hemisphere location
 #this information is used to separate the clusters after transforming them back to the input tractography space
@@ -94,14 +110,22 @@ wm_assess_cluster_location_by_hemisphere.py \
    -clusterLocationFile \
    $atlasDirectory/cluster_hemisphere_location.txt
 
-#NEW STEP: transform fiber locations
+##############
+#STEP 5 OF 8
+##############
+
+#transform fiber locations
 wm_harden_transform.py -i -t \
    $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_{subject}_eddy_fixed_SlicerTractography.tfm \
    ./FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' \
    ./FiberClustering/TransformedClusters/${subject} \
    /opt/quarantine/slicer/0,nightly  #or maybe no 0?
 
-#STEP 4 OF 6:creates /FiberClustering/SeparatedClusters (formerly ClusterByHemisphere)
+##############
+#STEP 6 OF 8
+##############
+
+#creates /FiberClustering/SeparatedClusters (formerly ClusterByHemisphere)
 #creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural, even if shouldn't exist, i.e., creates a 'left hemisphere' .vtp for commissural tracts)
 if [ ! -e $outputfolder/FiberClustering/SeparatedClusters/'OutliersPerSubject_'${subject} ]; then
 wm_separate_clusters_by_hemisphere.py \
@@ -112,7 +136,11 @@ else
   echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
 fi
 
-#STEP 5 OF 6: creates Anatomical tracts (formerly AppendClusters)
+##############
+#STEP 7 OF 8
+##############
+
+#creates Anatomical tracts (formerly AppendClusters)
 #combines the n=800 fiber bundles into the n=41 named tracts -- again, by hemisphere
 #if [ ! -e $outputfolder/AppendClusters/'OutliersPerSubject_'${subject} ]; then
 #for hemisphere in "${listHemispheres[@]}"; do
@@ -134,8 +162,11 @@ wm_append_clusters_to_anatomical_tracts.py \
    $atlas \
    $outputfolder/AnatomicalTracts
 
+##############
+#STEP 8 OF 8
+##############
 
-#STEP 6 OF 6:creates FiberMeasurements
+#creates FiberMeasurements
 #this step creates a csv file, again per hemisphere, with key metrics per n=41 named tracts, for each participant
 if [ ! -e $outputfolder/FiberMeasurements/${subject} ]; then
 for hemisphere in "${listHemispheres[@]}"; do
