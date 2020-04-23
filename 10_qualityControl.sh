@@ -76,16 +76,19 @@ wm_quality_control_tract_overlap.py $atlas $inputfolder/09_vtkRegisteredOnly $ou
 
 #QC registration of overlap between tractography and atlas _after_ registration (make sure tractography is now in the same space as the atlas)
 #expected output: jpg, with atlas in yellow, tractography in red
-wm_quality_control_tract_overlap.py $atlas $outputfolder/QC_02_overlapBeforeRegistration $outputfolder/QC_03_overlapAfterRegistration
+wm_quality_control_tract_overlap.py $atlas $inputfolder/09_vtkRegisteredOnly/01_TractRegistration $outputfolder/QC_03_overlapAfterRegistration
 
 #QC tractography fiber clustering
-#expected output: whole brain, but fibers have been clustered in n=800, coloured. All JPGs
-wm_quality_control_tractography.py $inputfolder/ClusterFromAtlas/${subname}/ $outputfolder/QC_04_clusterFromAtlas #won't work?... check output
+#expected output: whole brain, but fibers have been clustered in n=800. folders per cluster and per view. all grey.
+wm_quality_control_tractography.py $inputfolder/08_registered/FiberClustering/InitialClusters/${subname}/ $outputfolder/QC_04_clusterFromAtlas #won't work?... check output
 
-#QC
+#QC tractography after outlier removal
+#expected output: as above whole brain, but fibers have been clustered in n=800. folders per cluster and per view. all grey.
+wm_quality_control_tractography.py $inputfolder/08_registered/FiberClustering/OutlierRemovedClusters/${subname}/ $outputfolder/QC_05_FiberCluster-OutlierRemoved
 
-#Run on across each tract for all participants, with outliers removed
-wm_quality_control_tractography.py "/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered/Region_SubjectFile_Flattened/tracts_commissural" "/projects/ncalarco/thesis/SPINS/Slicer/data/10_QC/QC_02_finalTracts/tracts_commissural"
+#QC tractography of anatomical tracts
+wm_quality_control_tractography.py $inputfolder/08_registered//AnatomicalTracts/ $outputfolder/QC_06_AnatomicalTracts
+
 
 #Note: if running remotely, need to allow ssh connection to open up another window:
 #xvfb-run -s “-screen 0 640x480x24 +iglx” wm_quality_control_tractography.py $input_1 $output_1/
