@@ -5,7 +5,7 @@
 
 #Description:  Find and move preprocessed DWI data
 
-#Submission:  NA
+#Submission:   I run interactively in terminal
 
 #Notes: 
                #Data processed with dmriprep, the 'in-house' DWI preprocessing pipeline
