@@ -91,7 +91,7 @@ Slicer --launch DiffusionWeightedVolumeMasking \
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/TractographyLabelMapSeeding
 
 Slicer --launch TractographyLabelMapSeeding \
-  ${output_name}_DTI.nrrd \                     #DTI volume in which to generate tractography
+  ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
   --inputroi ${output_name}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
   --OutputFibers ${output_name}_SlicerTractography.vtk \      #name of tractography result
   --stoppingvalue 0.10                                        #tractography will stop when measurements drop below this value: note default is .25
