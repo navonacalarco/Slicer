@@ -12,6 +12,7 @@
 #Notes:        #All of these steps should be QC'd. Review outputs of https://github.com/navonacalarco/Slicer/blob/master/10_qualityControl.sh
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
+               #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
 ####################################################################################
 
 #SBATCH --partition=high-moby
@@ -137,7 +138,7 @@ wm_harden_transform.py -i -t \
    /opt/quarantine/slicer/0,nightly  #or maybe no 0?
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 6 OF 8
+#STEP 6 OF 8 ~~~MISSING SCRIPT~~~
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/SeparatedClusters (formerly ClusterByHemisphere)
@@ -166,7 +167,7 @@ fi
 #for hemisphere in "${listHemispheres[@]}"; do
 #echo $hemisphere
 #while read tractname; do
-#wm_append_clusters.py \
+#wm_append_clusters_to_anatomical_tracts.py \   #was previousy wm_append_clusters.py
 #  -appendedTractName $tractname \
 #  -tractMRML $atlasDirectory/$tractname'.mrml' \
 #  $outputfolder/ClusterByHemisphere/'OutliersPerSubject_'${subject}/$hemisphere \
