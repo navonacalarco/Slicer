@@ -1,13 +1,23 @@
-#DTIPrep expects a project specific protocol file protocol.xml. This ensures the scan collection parameters are the same across scans. The protocol.xml file must be manually created. We need to manually create this from within DTIPrep
+####################################################################################
+#Name:         05_makeXML
 
-#Participant choices for Prisma participants on which protocols are based were chosen from participants who passed DWI QC, randomly:
-    #CMP: CMP_0180
-    #MRP: MRP_0081
-    #ZHP: ZHP_0134
+#Last updated: 2020-03-17
 
-    #CMH: CMH_0135
-    #MRC: MRC_0055
-    #ZHH: ZHH_0021
+#Description:  #DTIPrep expects a project specific protocol file protocol.xml. This 
+               #ensures the scan collection parameters are the same across scans. 
+               #The protocol.xml file must be manually created, within DTIPrep 
+
+#Submission:   Use the DTIprep GUI interactively
+
+#Notes:        #Participant choices for participants on which protocols are based 
+               #were chosen from participants who passed DWI QC, randomly: 
+                    #CMP: CMP_0180
+                    #MRP: MRP_0081
+                    #ZHP: ZHP_0134
+                    #CMH: CMH_0135
+                    #MRC: MRC_0055
+                    #ZHH: ZHH_0021
+####################################################################################
 
 #module load DTIPrep
 #DTIPrep
