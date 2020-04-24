@@ -1,7 +1,19 @@
 ---
-title: "R Notebook"
+title: "01b_checkNumbers.Rmd"
 output: html_notebook
 ---
+
+####################################################################################
+#Name:         01b_checkNumbers.Rmd
+
+#Last updated: 2020-04-01
+
+#Description:  Makes sure all data we expect exists!
+
+#Submission:   Run interactively in RStudio
+
+#Notes:        No discrepancies on last run 
+####################################################################################
 
 #read in data
 `df_eddy` <- read.table("/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasEddy.txt", quote="\"", comment.char="")
