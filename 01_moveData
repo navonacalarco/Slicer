@@ -20,7 +20,7 @@ mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep
 cp -r /scratch/mjoseph/bids/SPINS/derivatives/dmriprep_new/sub-* /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep
 
 #also make a copy of the QC folder, for posterity
-cp /scratch/mjoseph/bids/SPINS/derivatives/dmriprep_new/QC /projects/ncalarco/thesis/SPINS/Slicer/01_dmriprepQC
+cp /scratch/mjoseph/bids/SPINS/derivatives/dmriprep_new/QC /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprepQC
 
 #if desired, find all directories of phantoms and tests that should delete (I will keep for now)
 cd /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep
