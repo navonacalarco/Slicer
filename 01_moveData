@@ -1,11 +1,11 @@
 ####################################################################################
-#Name:         01_moveData
+#Name:         #01_moveData
 
-#Last updated: 2020-04-22
+#Last updated: #2020-04-22
 
-#Description:  Find and move preprocessed DWI data
+#Description:  #Find and move preprocessed DWI data
 
-#Submission:   I run interactively in terminal
+#Submission:   #I run interactively in terminal
 
 #Notes: 
                #Data processed with dmriprep, the 'in-house' DWI preprocessing pipeline
