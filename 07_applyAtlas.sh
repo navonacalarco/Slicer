@@ -27,10 +27,10 @@
 #SBATCH --array=1-445
 
 #load modules 
-module load python/2.7.8-anaconda-2.1.0
+module load python/3.6.3-anaconda-5.0.1
 module load python-extras/2.7.8
-module load slicer/0,nightly #needs to be loaded first(?)
-module load whitematteranalysis/2018-07-19
+module load slicer/0,nightly 
+module load whitematteranalysis/2020-04-24
 
 #get lists of subjects
 cd $SLURM_SUBMIT_DIR
