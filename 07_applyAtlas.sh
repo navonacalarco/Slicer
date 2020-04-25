@@ -47,7 +47,7 @@ subject=`index`
 #define environment variables
 inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk             
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
-atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
+atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtpin
 clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
 tractsfile=/projects/ncalarco/thesis/SPINS/Slicer/documentation/tract_names.csv
 filename=`echo $1 | sed "s/.*\///" | sed "s/\..*//"`
@@ -113,7 +113,7 @@ else
 fi
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 4 OF 8 ~~~NOT WORKING~~~
+#STEP 4 OF 8 
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   NA
@@ -122,9 +122,13 @@ fi
 #                     This information is used to separate the clusters after transforming them back to the input tractography space
 #Time:                Fast
 
-/projects/ncalarco/thesis/SPINS/Slicer/scripts/wm_assess_cluster_location_by_hemisphere.py \  #don't have this currently in /opt _by_hemisphere
-   $outputfolder/02_FiberClustering/OutlierRemovedClusters \ #${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed' 
-   -clusterLocationFile $atlasDirectory/cluster_hemisphere_location.txt
+if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed'/cluster_location_by_hemisphere.log ]; then
+wm_assess_cluster_location_by_hemisphere.py \
+  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed' \
+  -clusterLocationFile $atlasDirectory/cluster_hemisphere_location.txt
+else
+  echo "wm_assess_cluster_location_by_hemisphere.py was already run on this subject!"
+fi
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 5 OF 8 ~~~HAVEN'T ATTEMPTED~~~
