@@ -131,15 +131,14 @@ else
 fi
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 5 OF 8 ~~~HAVEN'T ATTEMPTED~~~
+#STEP 5 OF 8 
 #--------------------------------------------------------------------------------------------------------------------
 
 #transform fiber locations
-wm_harden_transform.py -i -t \
-   $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_{subject}_eddy_fixed_SlicerTractography.tfm \
-   ./FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' \
-   ./FiberClustering/TransformedClusters/${subject} \
-   /opt/quarantine/slicer/0,nightly  #or maybe no 0?
+wm_harden_transform.py -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/'itk_txform_'${subject}'_eddy_fixed_SlicerTractography.tfm' \
+  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed' \
+  $outputfolder/02_FiberClustering/TransformedClusters/${subject} \
+  /opt/quarantine/slicer/nightly  
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 6 OF 8 ~~~MISSING SCRIPT~~~
