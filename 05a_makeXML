@@ -41,4 +41,4 @@
     #DOMINANTDIRECTION_BCheck                   Yes
     #DTI_bCompute                               Yes
 
-#Save As: the protocol.xml to `projects/ncalarco/thesis/SPINS/Slicer/dtiprepProtocols/site_protocol.xml`
+#Save As: the protocol.xml to `projects/ncalarco/thesis/SPINS/Slicer/data/05a_dtiprepProtocols/site_protocol.xml`
