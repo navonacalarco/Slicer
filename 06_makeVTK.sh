@@ -3,7 +3,7 @@
 ####################################################################################
 #Name:         06_makeVTK.sh
 
-#Last updated: 2020-04-22
+#Last updated: 2020-04-28
 
 #Description:  Fits a tensor, makes a mask, and performs tractography
 
@@ -61,6 +61,7 @@ Slicer --launch DWIToDTIEstimation \
   --outputTensor ${output_name}_DTI.nrrd \           #estimated DTI volume
   --outputBaseline ${output_name}_SCALAR.nrrd \      #estimated baseline (non-DW) volume (i.e., the b0)
   --enumeration WLS \                                #weighted least squares
+  --shiftNeg
                                    
 #DEFAULT PARAMETERS: 
 #shiftNeg: false    If true, shift negative eigenvalues so that all are positive: this accounts for unuseable tensor solutions related to noise or acquisition error
@@ -76,7 +77,8 @@ Slicer --launch DWIToDTIEstimation \
 Slicer --launch DiffusionWeightedVolumeMasking \
   --inputVolume ${inputimage} \
   --outputBaseline ${output_name}_SCALAR.nrrd \
-  --thresholdMask ${output_name}_MASK.nrrd
+  --thresholdMask ${output_name}_MASK.nrrd \
+  --removeislands
 
 #DEFAULT PARAMETERS: 
 #remoteislands: true            Removes disconnected regions from brain mask
@@ -94,7 +96,8 @@ Slicer --launch TractographyLabelMapSeeding \
   ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
   --inputroi ${output_name}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
   --OutputFibers ${output_name}_SlicerTractography.vtk \      #name of tractography result
-  --stoppingvalue 0.10                                        #tractography will stop when measurements drop below this value: note default is .25
+  --stoppingvalue 0.10 \                                       #tractography will stop when measurements drop below this value: note default is .25
+  --useindexspace 
 
 #DEFAULT PARAMETERS
 #start threhold: .3                 Minimum Linear Measure for the seeding to start
