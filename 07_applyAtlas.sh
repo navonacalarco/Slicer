@@ -29,7 +29,6 @@
 
 #load modules 
 module load python/3.6.3-anaconda-5.0.1
-#module load python-extras/2.7.8
 module load slicer/0,nightly 
 module load whitematteranalysis/2020-04-24
 
@@ -49,11 +48,9 @@ subject=`index`
 inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk             
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
-clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
-tractsfile=/projects/ncalarco/thesis/SPINS/Slicer/documentation/tract_names.csv
-filename=`echo $1 | sed "s/.*\///" | sed "s/\..*//"`
+#clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
+#tractsfile=/projects/ncalarco/thesis/SPINS/Slicer/documentation/tract_names.csv
 atlasDirectory=`dirname $atlas`
-declare -a listHemispheres=("tracts_commissural" "tracts_left_hemisphere" "tracts_right_hemisphere")
 
 #make output folder
 mkdir -p $outputfolder
@@ -150,59 +147,39 @@ fi
 #STEP 5 OF 8 
 #--------------------------------------------------------------------------------------------------------------------
 
+#Directory created:   02/FiberClustering/TransformedClusters
+#Description:         This script applies the transforms established in STEP 4
+#Time:                Fast
+#Note:                whitematteranalysis calls Slicer, and briefly opens the Slicer GUI; this fails over remote (external display)
+
 #transform fiber locations
 wm_harden_transform.py \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography/ \
-  xvfb-run -a -s "-screen 0 640x480x24 +iglx" /opt/quarantine/slicer/nightly \
+  /opt/quarantine/slicer/nightly \
   -i \
   -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 6 OF 8 ~~~MISSING SCRIPT~~~
+#STEP 6 OF 8 
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/SeparatedClusters (formerly ClusterByHemisphere)
-#Description:         This script creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural) even if shouldn't exist 
-#                     A .vtp is created even if a given tract should't exist, i.e., creates a 'left hemisphere' .vtp for commissural tracts
-#                     The default hemisphere fiber percent threshold is 0.6                    
-#Note:                NEED TO CHANGE INPUT TO TransformedClusters WHEN STEP 5 WORKS
-#Time:                
+#Directory created:   FiberClustering/SeparatedClusters, and three subdirectories 
+#Description:         This script creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural) 
+#Time:                Fast    
 
-if [ ! -e $outputfolder/02_FiberClustering/SeparatedClusters/'OutliersPerSubject_'${subject} ]; then
 wm_separate_clusters_by_hemisphere.py \
-  -atlasMRML $clusteredmrml \
-  $outputfolder/02_FiberClustering/OutlierRemovedClusters \ 
-  $outputfolder/02_FiberClustering/SeparatedClusters
-else
-  echo "wm_separate_clusters_by_hemisphere.py was already run on this subject!"
-fi
+  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography \
+  $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 7 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#creates Anatomical tracts (formerly AppendClusters)
-#combines the n=800 fiber bundles into the n=41 named tracts -- again, by hemisphere
-#if [ ! -e $outputfolder/AppendClusters/'OutliersPerSubject_'${subject} ]; then
-#for hemisphere in "${listHemispheres[@]}"; do
-#echo $hemisphere
-#while read tractname; do
-#wm_append_clusters_to_anatomical_tracts.py \   #was previousy wm_append_clusters.py
-#  -appendedTractName $tractname \
-#  -tractMRML $atlasDirectory/$tractname'.mrml' \
-#  $outputfolder/ClusterByHemisphere/'OutliersPerSubject_'${subject}/$hemisphere \
-#  $outputfolder/AppendClusters/'OutliersPerSubject_'${subject}/$hemisphere >> /projects/ncalarco/thesis/SPINS/Slicer/logs/log_wma.txt
-#done < $tractsfile
-#done
-#else
-#  echo "wm_append_clusters.py was already run on this subject!"
-#fi
-
-wm_append_clusters_to_anatomical_tracts.py \
-   $outputfolder/FiberClustering/SeparatedClusters \
-   $atlas \
-   $outputfolder/AnatomicalTracts
+#Directory created:   NA
+#Description:         Create .csvs for left, right, commissural
+#Time:                Fast    
+#Note:                DECIDED TO TAKE DIFFUSION MEASUREMENTS FROM ANATOMICAL TRACTS (STEP 8) AND NOT SEPARATED CLUSTERS
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 8 OF 8
@@ -210,18 +187,10 @@ wm_append_clusters_to_anatomical_tracts.py \
 
 #creates FiberMeasurements
 #this step creates a csv file, again per hemisphere, with key metrics per n=41 named tracts, for each participant
-if [ ! -e $outputfolder/FiberMeasurements/${subject} ]; then
-for hemisphere in "${listHemispheres[@]}"; do
-echo $hemisphere
-mkdir -p $outputfolder/FiberClustering/SeparatedClusters/${subject}/$hemisphere/
-echo $outputfolder/FiberClustering/SeparatedClusters/${subject}/$hemisphere >> /projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/FiberMeasurements.txt;
-FiberTractMeasurements \
-  --outputfile $outputfolder/FiberClustering/SeparatedClusters/${subject}/$hemisphere/${subject}'.csv' \
-  --inputdirectory $outputfolder/AnatomicalTracts/'OutliersPerSubject_'${subject}/$hemisphere \
-  -i Fibers_File_Folder \
-  --separator Tab \
-  -f Column_Hierarchy
-done
-else
-  echo "FiberTractMeasurements was already run on this subject!"
-fi
+
+wm_diffusion_measurements.py \
+  $outputfolder/03_AnatomicalTracts/${subject} \
+  $outputfolder/04_DiffusionMeasurements/${subject}_anatomical_tracts.csv \
+  /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+
+
