@@ -177,11 +177,39 @@ wm_separate_clusters_by_hemisphere.py \
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   04_DiffusionMeasurements
-#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique)
+#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique), by L, R, C
 #Time:                Fast    
 #Note:                Here, I have opted to take measurements by tract, and not hemisphere. 
-#                     However, the same code can be run on the SeparatedClusters directory to get measurements by L, R, C
 
+#left
+wm_diffusion_measurements.py \
+  $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_left_hemisphere/ \
+  $outputfolder/04_DiffusionMeasurements/${subject}_left_hemisphere_clusters.csv \
+  /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+  #/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/FiberTractMeasurements
+  
+#right
+wm_diffusion_measurements.py \
+  $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_right_hemisphere/ \
+  $outputfolder/04_DiffusionMeasurements/${subject}_right_hemisphere_clusters.csv \
+  /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+  
+#commissural
+wm_diffusion_measurements.py \
+  $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_commissural/ \
+  $outputfolder/04_DiffusionMeasurements/${subject}_commissural_clusters.csv \
+  /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+  
+#--------------------------------------------------------------------------------------------------------------------
+#STEP 8 OF 7
+#--------------------------------------------------------------------------------------------------------------------
+
+#Directory created:   04_DiffusionMeasurements
+#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique), by L, R, C
+#Time:                Fast    
+#Note:                Here, I have opted to take measurements by tract, and not hemisphere. 
+
+#anatomical tracts
 wm_diffusion_measurements.py \
   $outputfolder/03_AnatomicalTracts/${subject} \
   $outputfolder/04_DiffusionMeasurements/${subject}_anatomical_tracts.csv \
