@@ -3,7 +3,7 @@
 ####################################################################################
 #Name:         #07_applyAtlas.sh
 
-#Last updated: #2020-04-22
+#Last updated: #2020-04-26
 
 #Description:  #Runs all whitematteranalyses (registration to atlas, fiber bundling, etc)
 
@@ -56,7 +56,7 @@ atlasDirectory=`dirname $atlas`
 mkdir -p $outputfolder
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 1 OF 8
+#STEP 1 OF 7
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   01_TractRegistration
@@ -81,7 +81,7 @@ fi
 #-lmax  max fiber length      Maximum length (mm) of fibers to analyze. Default is 260mm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 2 OF 8
+#STEP 2 OF 7
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/InitialClusters/ 
@@ -103,7 +103,7 @@ fi
 #-l   Minimum fiber length (mm) of fibers to analyze. Default is 60mm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 3 OF 8
+#STEP 3 OF 7
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/OutlierRemovedClusters
@@ -122,7 +122,7 @@ else
 fi
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 4 OF 8 
+#STEP 4 OF 7 
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   NA
@@ -144,11 +144,11 @@ fi
 #           The default number is 0.6. A higher number tends to label fewer fibers as hemispheric and more as commissural.
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 5 OF 8 
+#STEP 5 OF 7
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   02/FiberClustering/TransformedClusters
-#Description:         This script applies the transforms established in STEP 4
+#Description:         This script applies the inverse transform matrix established in STEP 4, i.e., it transforms them to the input tractography space
 #Time:                Fast
 #Note:                whitematteranalysis calls Slicer, and briefly opens the Slicer GUI; this fails over remote (external display)
 
@@ -161,7 +161,7 @@ wm_harden_transform.py \
   -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 6 OF 8 
+#STEP 6 OF 7 
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/SeparatedClusters, and three subdirectories 
@@ -173,20 +173,14 @@ wm_separate_clusters_by_hemisphere.py \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 7 OF 8
+#STEP 7 OF 7
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   NA
-#Description:         Create .csvs for left, right, commissural
+#Directory created:   04_DiffusionMeasurements
+#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique)
 #Time:                Fast    
-#Note:                DECIDED TO TAKE DIFFUSION MEASUREMENTS FROM ANATOMICAL TRACTS (STEP 8) AND NOT SEPARATED CLUSTERS
-
-#--------------------------------------------------------------------------------------------------------------------
-#STEP 8 OF 8
-#--------------------------------------------------------------------------------------------------------------------
-
-#creates FiberMeasurements
-#this step creates a csv file, again per hemisphere, with key metrics per n=41 named tracts, for each participant
+#Note:                Here, I have opted to take measurements by tract, and not hemisphere. 
+#                     However, the same code can be run on the SeparatedClusters directory to get measurements by L, R, C
 
 wm_diffusion_measurements.py \
   $outputfolder/03_AnatomicalTracts/${subject} \
