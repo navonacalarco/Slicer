@@ -9,7 +9,8 @@
 
 #Submission:   #sbatch (remember to change the array to reflect number of participants)
 
-#Notes:        #All of these steps should be QC'd. Review outputs of https://github.com/navonacalarco/Slicer/blob/master/10_qualityControl.sh
+#Notes:        #These scripts have positional arguments, so don't change order
+               #All of these steps should be QC'd. Review outputs of https://github.com/navonacalarco/Slicer/blob/master/10_qualityControl.sh
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
                #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
@@ -28,7 +29,7 @@
 
 #load modules 
 module load python/3.6.3-anaconda-5.0.1
-module load python-extras/2.7.8
+#module load python-extras/2.7.8
 module load slicer/0,nightly 
 module load whitematteranalysis/2020-04-24
 
@@ -47,7 +48,7 @@ subject=`index`
 #define environment variables
 inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk             
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
-atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtpin
+atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
 clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
 tractsfile=/projects/ncalarco/thesis/SPINS/Slicer/documentation/tract_names.csv
 filename=`echo $1 | sed "s/.*\///" | sed "s/\..*//"`
@@ -61,27 +62,33 @@ mkdir -p $outputfolder
 #STEP 1 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   01_TractRegistration (formerly RegisterToAtlas)
+#Directory created:   01_TractRegistration
 #Description:         Register each subject to the ORG800 atlas
-#Notes:               We are using rigid-affine registration (cf. affine + nonrigid), which is appropriate for our population. The created .tfm file is the transform matrix
+#Notes:               We are using rigid-affine registration (cf. affine + nonrigid), which is appropriate for our population. 
+#                     The created .tfm file is the transform matrix
 #Time:                Slow
 
 if [ ! -e $outputfolder/01_TractRegistration/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
 wm_register_to_atlas_new.py \
   -mode rigid_affine_fast \
-  $inputfolder \
-  $atlas \
-  $outputfolder/01_TractRegistration
+  $inputfolder \                          #inputSubject
+  $atlas \                                #inputAtlas
+  $outputfolder/01_TractRegistration      #outputDirectory
 else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
 fi
+
+#OPTIONAL ARGUMENTS
+#-f     number of fibers      Number of fibers to analyze. Default is 20,000
+#-l     min fiber length      Minimum length (mm) of fibers to analyze. Default is 40mm
+#-lmax  max fiber length      Maximum length (mm) of fibers to analyze. Default is 260mm
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 2 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/InitialClusters/ (formerly ClusterFromAtlas)
-#Description:         Create n=800 clusters from fibers 
+#Directory created:   FiberClustering/InitialClusters/ 
+#Description:         Create n=800 clusters from fibers in accordance with ORG atlas
 #Note:                Previously had flag for `-l 20`
 #Time:                Fast
 
@@ -94,13 +101,18 @@ else
   echo "wm_cluster_from_atlas_new.py was already run on this subject!"
 fi
 
+#OPTIONAL ARGUMENTS
+#-f   Number of fibers; default is all fibers
+#-l   Minimum fiber length (mm) of fibers to analyze. Default is 60mm
+
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 3 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/OutlierRemovedClusters/ (formerly OutliersPerSubject)
+#Directory created:   FiberClustering/OutlierRemovedClusters
 #Description:         Removes outliers (at SD=4) from the n=800 clusters created in Step 2
 #Time:                Slow
+#Notes:               See a lot of "cluster is empty in subject". There are very few such messages in example data.
 
 if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' ]; then
 wm_cluster_remove_outliers.py \
@@ -130,15 +142,21 @@ else
   echo "wm_assess_cluster_location_by_hemisphere.py was already run on this subject!"
 fi
 
+#OPTIONAL ARGUMENTS
+#-pthresh   The percent of a fiber that has to be in one hemisphere to consider the fiber as part of that hemisphere.
+#           The default number is 0.6. A higher number tends to label fewer fibers as hemispheric and more as commissural.
+
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 5 OF 8 
 #--------------------------------------------------------------------------------------------------------------------
 
 #transform fiber locations
-wm_harden_transform.py -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/'itk_txform_'${subject}'_eddy_fixed_SlicerTractography.tfm' \
-  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed' \
-  $outputfolder/02_FiberClustering/TransformedClusters/${subject} \
-  /opt/quarantine/slicer/nightly  
+wm_harden_transform.py \
+  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
+  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography/ \
+  xvfb-run -a -s "-screen 0 640x480x24 +iglx" /opt/quarantine/slicer/nightly \
+  -i \
+  -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 6 OF 8 ~~~MISSING SCRIPT~~~
