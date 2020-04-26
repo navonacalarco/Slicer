@@ -78,11 +78,13 @@ Slicer --launch DiffusionWeightedVolumeMasking \
   --inputVolume ${inputimage} \
   --outputBaseline ${output_name}_SCALAR.nrrd \
   --thresholdMask ${output_name}_MASK.nrrd \
-  --removeislands
+  --removeislands \
+  --otsuomegathreshold 0.7
 
 #DEFAULT PARAMETERS: 
 #remoteislands: true            Removes disconnected regions from brain mask
 #baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
+#otsuomegathreshold: 0.5        Controls the sharpness threshold in the Otsu computation. 0 = lower threshold, 1 = higher threshold
 
 ####################################################################################
 #STEP 3: WHOLE BRAIN TRACTOGRAPHY
