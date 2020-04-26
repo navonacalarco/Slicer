@@ -92,6 +92,7 @@ wm_quality_control_tractography.py $inputfolder/08_registered//AnatomicalTracts/
 
 #Note: if running remotely, need to allow ssh connection to open up another window:
 #xvfb-run -s “-screen 0 640x480x24 +iglx” wm_quality_control_tractography.py $input_1 $output_1/
+#see issue here: https://github.com/TIGRLab/admin/issues/1820
 
 #As indicated above, this script can be modified to interrogate the outputs after each of the 6 processing steps in 07_applyAtlas: 
 #RegisterToAtlas 

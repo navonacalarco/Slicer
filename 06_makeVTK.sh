@@ -52,49 +52,48 @@ export output_name="${outputdir}/${stem}"
 #STEP 1: FIT THE TENSOR
 ####################################################################################
 
-#diffusion tensor estimation
-#in the GUI: Modules > Diffusion > Process > Diffusion Tensor Estimation
+#Description:   Perform diffusion tensor estimation
+#GUI analogue:  Modules > Diffusion > Process > Diffusion Tensor Estimation
+#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DWIToDTIEstimation
 
 Slicer --launch DWIToDTIEstimation \
-  --enumeration WLS \               #weighted least squares
-  --shiftNeg \                      #shift negative eigenvalues
-  ${inputimage} \
-  ${output_name}_DTI.nrrd \         #outputTensor: estimated DTI volume
-  ${output_name}_SCALAR.nrrd        #outputBaseline: estimated baseline (non-DW) volume (i.e., the b0)
-
-#NOTE: 
-#We opted to shift eigenvalues so all are positive 
-#This accounts for unuseable tensor solutions related to noise or acquisition error
+  --inputVolume ${inputimage} \                      #input raw DWI (must be .nrrd, no floats)
+  --outputTensor ${output_name}_DTI.nrrd \           #estimated DTI volume
+  --outputBaseline ${output_name}_SCALAR.nrrd \      #estimated baseline (non-DW) volume (i.e., the b0)
+  --enumeration WLS \                                #weighted least squares
+                                   
+#DEFAULT PARAMETERS: 
+#shiftNeg: false    If true, shift negative eigenvalues so that all are positive: this accounts for unuseable tensor solutions related to noise or acquisition error
 
 ####################################################################################
 #STEP 2: MAKE A MASK
 ####################################################################################
  
-#diffusion volume brain masking
-#in the GUI: Modules > Diffusion > Process > Diffusion Brain Masking
+#Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
+#GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
+#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
 
 Slicer --launch DiffusionWeightedVolumeMasking \
-  --removeislands \
-  ${inputimage} \
-  ${output_name}_SCALAR.nrrd \
-  ${output_name}_MASK.nrrd
+  --inputVolume ${inputimage} \
+  --outputBaseline ${output_name}_SCALAR.nrrd \
+  --thresholdMask ${output_name}_MASK.nrrd
 
-#NOTE: 
-#for tractography, I am  have decided to use masks made in Slicer
-#this should be sufficient; if issues, can use masks made with another software
+#DEFAULT PARAMETERS: 
+#remoteislands: true            Removes disconnected regions from brain mask
+#baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
 
 ####################################################################################
 #STEP 3: WHOLE BRAIN TRACTOGRAPHY
 ####################################################################################
 
-#label map seeding
-#in the GUI: Modules > Tractography Seeding
+#Description:   Whole brain tractography via label map seeding
+#GUI analogue:  Modules > Tractography Seeding
+#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/TractographyLabelMapSeeding
 
 Slicer --launch TractographyLabelMapSeeding \
-  --inputvolume ${output_name}_DTI.nrrd \                     #DTI volume in which to generate tractography
+  ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
   --inputroi ${output_name}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
-  --outputfibers ${output_name}_SlicerTractography.vtk \      #name of tractography result
-  --useindexspace \                                           #seed at the IJK voxel
+  --OutputFibers ${output_name}_SlicerTractography.vtk \      #name of tractography result
   --stoppingvalue 0.10                                        #tractography will stop when measurements drop below this value: note default is .25
 
 #DEFAULT PARAMETERS
@@ -104,6 +103,7 @@ Slicer --launch TractographyLabelMapSeeding \
 #thresholdmode: FA                  Tensor measurement used to start and stop the tractography
 #stopping curvature: .7             Tractography will stop if radius of curvature becomes smaller than this number units are degrees per mm
 #integration step length: .5        Distance between points on the same fiber in mm
+#use index space: true              Seed at the IJK voxel
 
 ####################################################################################
   

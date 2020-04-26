@@ -10,6 +10,8 @@
 #Notes: 
                #Data processed with dmriprep, the 'in-house' DWI preprocessing pipeline
                #Outputs of dmriprep currently in MJ's folder, soon be in archive 
+               #Michael's pre-processing code is here: 
+               #https://github.com/nipreps/dmriprep/blob/d07d4b090097675ae7de8199963467d4d2258737/dmriprep/workflows/dwi/util.py#L117
 ####################################################################################
 
 #make a new directory
