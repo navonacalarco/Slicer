@@ -3,13 +3,14 @@
 ####################################################################################
 #Name:         #07_applyAtlas.sh
 
-#Last updated: #2020-04-26
+#Last updated: #2020-04-27
 
 #Description:  #Runs all whitematteranalyses (registration to atlas, fiber bundling, etc)
 
 #Submission:   #sbatch (remember to change the array to reflect number of participants)
 
 #Notes:        #These scripts have positional arguments, so don't change order
+               #These scripts call the whitematteranalysis package (cf. Slicer). This means that the commands can be run as is on a Mac (!); no need to change paths
                #All of these steps should be QC'd. Review outputs of https://github.com/navonacalarco/Slicer/blob/master/10_qualityControl.sh
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
