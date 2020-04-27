@@ -55,8 +55,11 @@ export output_name="${outputdir}/${stem}"
 #Description:   Perform diffusion tensor estimation
 #GUI analogue:  Modules > Diffusion > Process > Diffusion Tensor Estimation
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DWIToDTIEstimation
+#Note:          If running from home (Mac), need to put complete path to Slicer: /Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/DWIToDTIEstimation 
+#               Weighted least squares (cf. least squares) takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.
 
 Slicer --launch DWIToDTIEstimation \
+#/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/DWIToDTIEstimation \
   --inputVolume ${inputimage} \                      #input raw DWI (must be .nrrd, no floats)
   --outputTensor ${output_name}_DTI.nrrd \           #estimated DTI volume
   --outputBaseline ${output_name}_SCALAR.nrrd \      #estimated baseline (non-DW) volume (i.e., the b0)
