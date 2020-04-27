@@ -55,11 +55,10 @@ export output_name="${outputdir}/${stem}"
 #Description:   Perform diffusion tensor estimation
 #GUI analogue:  Modules > Diffusion > Process > Diffusion Tensor Estimation
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DWIToDTIEstimation
-#Note:          If running from home (Mac), need to put complete path to Slicer: /Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/DWIToDTIEstimation 
-#               Weighted least squares (cf. least squares) takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.
+#Note:          Weighted least squares (cf. least squares) takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.
+#Time:          Lengthy
 
 Slicer --launch DWIToDTIEstimation \
-#/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/DWIToDTIEstimation \
   --inputVolume ${inputimage} \                      #input raw DWI (must be .nrrd, no floats)
   --outputTensor ${output_name}_DTI.nrrd \           #estimated DTI volume
   --outputBaseline ${output_name}_SCALAR.nrrd \      #estimated baseline (non-DW) volume (i.e., the b0)
@@ -69,6 +68,24 @@ Slicer --launch DWIToDTIEstimation \
 #DEFAULT PARAMETERS: 
 #shiftNeg: false    If true, shift negative eigenvalues so that all are positive: this accounts for unuseable tensor solutions related to noise or acquisition error
 
+#-----------------------------------------------------------------------------------
+#If running a test from home (MAC) on data on local computer:
+
+#First, need to add the Slicer library to my Python path
+#export PYTHONPATH=${PYTHONPATH}:/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules
+
+#Make a .txt of test subject IDs, and fit tensor:
+#while read subject
+#do
+#   /Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/DWIToDTIEstimation \
+#  ${nrrd_dir}/${subject}_eddy_fixed.nrrd \
+#  ${vtk_dir}/${subject}_DTI.nrrd \
+#  ${vtk_dir}/${subject}_SCALAR.nrrd \
+#  --enumeration WLS \
+#  --shiftNeg
+#done < ${base_path}/participantList.txt
+#-----------------------------------------------------------------------------------
+
 ####################################################################################
 #STEP 2: MAKE A MASK
 ####################################################################################
@@ -76,6 +93,7 @@ Slicer --launch DWIToDTIEstimation \
 #Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
 #GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
+#Time:          Fast
 
 Slicer --launch DiffusionWeightedVolumeMasking \
   --inputVolume ${inputimage} \
@@ -100,7 +118,7 @@ Slicer --launch DiffusionWeightedVolumeMasking \
 Slicer --launch TractographyLabelMapSeeding \
   ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
   --inputroi ${output_name}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
-  --OutputFibers ${output_name}_SlicerTractography.vtk \      #name of tractography result
+  ${output_name}_SlicerTractography.vtk \                     #name of tractography result
   --stoppingvalue 0.10 \                                       #tractography will stop when measurements drop below this value: note default is .25
   --useindexspace 
 
