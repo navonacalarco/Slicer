@@ -89,6 +89,21 @@ wm_quality_control_tractography.py $inputfolder/08_registered/FiberClustering/Ou
 #QC tractography of anatomical tracts
 wm_quality_control_tractography.py $inputfolder/08_registered//AnatomicalTracts/ $outputfolder/QC_06_AnatomicalTracts
 
+#To find outliers in measurements (and issues like different headeers
+wm_quality_control_cluster_measurements.py measurement_directory -outlier_std 3
+
+#We can also extract and visualize a single cluster across multiple subjects!
+wm_extract_cluster.py 170 all_subjects_clusters cluster_170 #this extracts
+#then, run wm_quality_control
+
+#We can also view this bundle / tracts across subjects
+wm_create_mrml_file.py tract_directory/
+
+#We can also create an average tract. See https://github.com/SlicerDMRI/whitematteranalysis/wiki/3)-Visualization-of-Clustered-Tracts
+
+
+
+
 
 #Note: if running remotely, need to allow ssh connection to open up another window:
 #xvfb-run -s “-screen 0 640x480x24 +iglx” wm_quality_control_tractography.py $input_1 $output_1/
