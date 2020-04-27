@@ -156,7 +156,7 @@ fi
 wm_harden_transform.py \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography/ \
-  /opt/quarantine/slicer/nightly \
+  /opt/quarantine/slicer/nightly/build/Slicer \
   -i \
   -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
 
