@@ -110,7 +110,7 @@ wm_quality_control_tractography.py \
 
 wm_quality_control_tractography.py \
   $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \ 
-  $outputfolder/QC_06_AnatomicalTracts/${subject}
+  $outputfolder/QC_06_AnatomicalTracts
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 7 OF X       
