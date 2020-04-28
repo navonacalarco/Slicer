@@ -151,7 +151,8 @@ fi
 #Directory created:   02/FiberClustering/TransformedClusters
 #Description:         This script applies the inverse transform matrix established in STEP 4, i.e., it transforms them to the input tractography space
 #Time:                Fast
-#Note:                whitematteranalysis calls Slicer, and briefly opens the Slicer GUI; this fails over remote (external display)
+#Note:                whitematteranalysis calls Slicer, and briefly opens the Slicer GUI
+#                     On MAC, change Slicer path to /Applications/Slicer.app/Contents/MacOS/Slicer
 
 #transform fiber locations
 wm_harden_transform.py \
