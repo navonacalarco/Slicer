@@ -60,7 +60,7 @@ wm_quality_control_tractography.py \
 
 wm_quality_control_tract_overlap.py \ 
   ${atlas} \
-  ${inputfolder}/07_vtkTractsOnly/${subject}_SlicerTractography.vtk \
+  ${inputfolder}/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk \
   ${outputfolder}/QC_02_overlapBeforeRegistration/${subject}/
 
 #--------------------------------------------------------------------------------------------------------------------
@@ -72,31 +72,56 @@ wm_quality_control_tract_overlap.py \
 
 wm_quality_control_tract_overlap.py \
   ${atlas} \
-  ${inputfolder}/01_TractRegistration/${subject}_SlicerTractography/output_tractography/${subject}_SlicerTractography_reg.vtk \
-  ${outputfolder}/05_QC/QC_03_overlapPostRegistration/${subject}/
+  ${inputfolder}/08_registered/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/${subject}_eddy_fixed_SlicerTractography_reg.vtk \
+  ${outputfolder}/QC_03_overlapPostRegistration/${subject}/
   
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 4 OF X
+#STEP 4 OF X        | OPTIONAL TO RUN / REVIEW
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/04_fiberClusterInitial
+#Directory created:  10_QC/04_clusterFromAtlas
 #Description:        Creates n=800 fiber clusters, before outliers have been removed (all grey, and 6 views available)   
 #Note:               Note that the wm_cluster_from_atlas.py script creates jpgs in 02_FiberClustering/InitialClusters/
 #Time:               Long
 
 wm_quality_control_tractography.py \
-  $inputfolder/08_registered/FiberClustering/InitialClusters/${subject}_SlicerTractography_reg/ \ 
+  $inputfolder/08_registered/02_FiberClustering/InitialClusters/${subject}_eddy_fixed_SlicerTractography_reg/ \ 
   $outputfolder/QC_04_clusterFromAtlas/${subject}
+  
+#--------------------------------------------------------------------------------------------------------------------
+#STEP 5 OF X       | OPTIONAL TO RUN / REVIEW
+#--------------------------------------------------------------------------------------------------------------------
 
-#QC tractography after outlier removal
-#expected output: as above whole brain, but fibers have been clustered in n=800. folders per cluster and per view. all grey.
-wm_quality_control_tractography.py $inputfolder/08_registered/FiberClustering/OutlierRemovedClusters/${subname}/ $outputfolder/QC_05_FiberCluster-OutlierRemoved
+#Directory created:  10_QC/05_noOutliers
+#Description:        Creates n=800 fiber clusters, after outliers have been removed (all grey, and 6 views available)   
+#Time:               Long
 
-#QC tractography of anatomical tracts
-wm_quality_control_tractography.py $inputfolder/08_registered//AnatomicalTracts/ $outputfolder/QC_06_AnatomicalTracts
+wm_quality_control_tractography.py \
+  $inputfolder/08_registered/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
+  $outputfolder/QC_05_noOutliers/${subject}
+  
+#--------------------------------------------------------------------------------------------------------------------
+#STEP 6 OF X       
+#--------------------------------------------------------------------------------------------------------------------
 
-#To find outliers in measurements (and issues like different headeers
-wm_quality_control_cluster_measurements.py measurement_directory -outlier_std 3
+#Directory created:  10_QC/06_tracts
+#Description:        Creates n=41 anatomical tracts, after outliers have been removed (all grey, and 6 views available)   
+#Time:               Long
+
+wm_quality_control_tractography.py \
+  $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \ 
+  $outputfolder/QC_06_AnatomicalTracts/${subject}
+  
+#--------------------------------------------------------------------------------------------------------------------
+#STEP 7 OF X       
+#--------------------------------------------------------------------------------------------------------------------
+
+#Directory created:  NA (run interactively)
+#Description:        To find outliers in measurements (and issues like different headeers
+
+wm_quality_control_cluster_measurements.py \
+  $inputfolder/08_registered/04_DiffusionMeasurements/ \
+  -outlier_std 3
 
 #We can also extract and visualize a single cluster across multiple subjects!
 wm_extract_cluster.py 170 all_subjects_clusters cluster_170 #this extracts
