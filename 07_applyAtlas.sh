@@ -57,7 +57,7 @@ atlasDirectory=`dirname $atlas`
 mkdir -p $outputfolder
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 1 OF 7
+#STEP 1 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   01_TractRegistration
@@ -82,7 +82,7 @@ fi
 #-lmax  max fiber length      Maximum length (mm) of fibers to analyze. Default is 260mm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 2 OF 7
+#STEP 2 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/InitialClusters/ 
@@ -104,7 +104,7 @@ fi
 #-l   Minimum fiber length (mm) of fibers to analyze. Default is 60mm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 3 OF 7
+#STEP 3 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/OutlierRemovedClusters
@@ -123,7 +123,7 @@ else
 fi
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 4 OF 7 
+#STEP 4 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   NA
@@ -145,7 +145,7 @@ fi
 #           The default number is 0.6. A higher number tends to label fewer fibers as hemispheric and more as commissural.
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 5 OF 7
+#STEP 5 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   02/FiberClustering/TransformedClusters
@@ -163,7 +163,7 @@ wm_harden_transform.py \
   -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 6 OF 7 
+#STEP 6 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   FiberClustering/SeparatedClusters, and three subdirectories 
@@ -173,15 +173,28 @@ wm_harden_transform.py \
 wm_separate_clusters_by_hemisphere.py \
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
+  
+#--------------------------------------------------------------------------------------------------------------------
+#STEP 7 OF 9
+#--------------------------------------------------------------------------------------------------------------------
+
+#Directory created:   04_Anatomical tracts
+#Description:         Computers anatomical fiber tracts according to atlas (73 anatomical tracts defined by ORG)
+#Time:                Fast    
+#Note:                 
+
+wm_append_clusters_to_anatomical_tracts.py \
+  $outputfolder/02_FiberClustering/SeparatedClusters/${subject} \
+  $atlasDirectory/ \
+  $outputfolder/03_AnatomicalTracts/${subject}
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 7 OF 7
+#STEP 8 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   04_DiffusionMeasurements
-#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique), by L, R, C
+#Description:         Fiber measurements by cluster. Creates a single .csv with values for each participants for the n=800, by L, R, C 
 #Time:                Fast    
-#Note:                Here, I have opted to take measurements by tract, and not hemisphere. 
 
 #left
 wm_diffusion_measurements.py \
@@ -203,13 +216,12 @@ wm_diffusion_measurements.py \
   /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
   
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 8 OF 7
+#STEP 9 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   04_DiffusionMeasurements
-#Description:         Create a single .csv with values for each participants for the n=73 tracts (N=41 unique), by L, R, C
+#Description:         Fiber measurements by tract. Create a single .csv with values for each participants for the n=73 tracts (N=41 unique), by L, R, C
 #Time:                Fast    
-#Note:                Here, I have opted to take measurements by tract, and not hemisphere. 
 
 #anatomical tracts
 wm_diffusion_measurements.py \
