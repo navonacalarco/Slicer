@@ -14,7 +14,7 @@
                #All of these steps should be QC'd. Review outputs of https://github.com/navonacalarco/Slicer/blob/master/10_qualityControl.sh
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
-               #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
+               #To see the help file, type `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
 ####################################################################################
 
 #SBATCH --partition=high-moby
