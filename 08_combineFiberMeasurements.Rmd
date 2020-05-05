@@ -5,7 +5,7 @@
 
 #Description:  #This script pulls in the .csvs in 04_DiffusionMeasurements
                #Each participant has a .csv for left, right, commissural
-               #
+               #These are combined into a single (final) .csv in txt_outputs
  
 ####################################################################################
 
