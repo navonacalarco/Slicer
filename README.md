@@ -1,6 +1,6 @@
-#README
+<p align="center">__README `Slicer`__</p>
 
-This repo primarily contains scripts to perform whole-brain deterministic tractography on single-shell data, using `3D Slicer` and `whitematteranalysis` software. Specifically, the directory contents are as follows:
+__Description.__ This repo primarily contains scripts to perform whole-brain deterministic tractography on single-shell data, using `3D Slicer` and `whitematteranalysis` software. Specifically, the directory contents are as follows:
 
 1. __`scripts.`__ These 9 scripts take in the lab's preprocessed DWI data, and run all subsequent steps ultimately required for tractography. The scripts should, more or less, be run sequentially: most rely on outputs made in prior scripts. 
 2. __`exampleData.`__ The example .vtk file is from the [whitematteranalysis tutorial](https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md). It was computed from one HCP healthy young adult subject, using UKF -- nonetheless, it is sufficient for running code tests (despite the fact we are not using UKF). It is not referenced by any scripts.
