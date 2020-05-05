@@ -1,18 +1,27 @@
-#This script is used to pull in csvs that are output from Slicer, and extra relevant values
+####################################################################################
+#Name:         #08_combineFiberMeasurements.Rmd
+
+#Last updated: #2020-05-05
+
+#Description:  #This script pulls in the .csvs in 04_DiffusionMeasurements
+               #Each participant has a .csv for left, right, commissural
+               #
+ 
+####################################################################################
 
 ```{r setup}
 
-#libraries
-library('data.table')
-library('tidyverse')
-library('dplyr')
-library('knitr')
-library('stringr')
-library('stringi')
-library('varhandle')
+#list required ibraries
+libraries <- c('data.table',
+   'tidyverse',
+   'dplyr',
+   'knitr',
+   'stringr',
+   'stringi',
+   'varhandle')
 
-#note: I first first moved all csvs from the 3 directory (commissural, left, right) into a single directory, in bash.
-#cd /projects/ncalarco/thesis/SPINS/Slicer/data/registered/FiberMeasurements
+#load all libraries
+lapply(libraries, require, character.only = T)
 
 #set working directory like this, so it doesn't change in each chunk!
 opts_knit$set(root.dir = '/mnt/tigrlab/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/05_FiberMeasurements_csvs')
@@ -22,7 +31,7 @@ opts_knit$set(root.dir = '/mnt/tigrlab/projects/ncalarco/thesis/SPINS/Slicer/txt
 ```{r}
 
 #create a vector of the csvs in our directory
-csvs <- list.files(path='/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/05_FiberMeasurements_csvs', pattern="*.csv") #have 1335
+csvs <- list.files(path='/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered/04_DiffusionMeasurements', pattern="*.csv") #have 1335
 
 #make sure that the 'index for rbind will be the filename (and not list index)
 csvs <- setNames(csvs, csvs)
