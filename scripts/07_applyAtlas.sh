@@ -85,7 +85,7 @@ fi
 #STEP 2 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/InitialClusters/ 
+#Directory created:   02_FiberClustering/InitialClusters/ 
 #Description:         Create n=800 clusters from fibers in accordance with ORG atlas
 #Note:                Previously had flag for `-l 20`
 #Time:                Fast
@@ -107,7 +107,7 @@ fi
 #STEP 3 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/OutlierRemovedClusters
+#Directory created:   02_FiberClustering/OutlierRemovedClusters
 #Description:         Removes outliers (at SD=4) from the n=800 clusters created in Step 2
 #Time:                Slow
 #Notes:               See a lot of "cluster is empty in subject". There are very few such messages in example data.
@@ -166,7 +166,7 @@ wm_harden_transform.py \
 #STEP 6 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   FiberClustering/SeparatedClusters, and three subdirectories 
+#Directory created:   02_FiberClustering/SeparatedClusters, and three subdirectories 
 #Description:         This script creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural) 
 #Time:                Fast    
 
@@ -178,7 +178,7 @@ wm_separate_clusters_by_hemisphere.py \
 #STEP 7 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   04_Anatomical tracts
+#Directory created:   03_Anatomical tracts
 #Description:         Computers anatomical fiber tracts according to atlas (73 anatomical tracts defined by ORG)
 #Time:                Fast    
 #Note:                 
