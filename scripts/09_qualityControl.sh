@@ -14,6 +14,7 @@
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
                #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
+               #Note: to visualize .jpg images and share via Rpubs, will need to downsample. I have used ImageMagick: `mogrify -strip -interlace Plane -gaussian-blur 0.05 -quality 75% *.jpg`
 ####################################################################################
 
 #SBATCH --array=18268
