@@ -1,4 +1,4 @@
-<p align="center"><b>README `Slicer`__</b></p>
+<p align="center"><b>README `Slicer`</b></p>
 
 __Description.__ This repo primarily contains scripts to perform whole-brain deterministic tractography on single-shell data, using `3D Slicer` and `whitematteranalysis` software. Specifically, the directory contents are as follows:
 
