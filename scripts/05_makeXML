@@ -1,0 +1,48 @@
+####################################################################################
+#Name:         05_makeXML
+
+#Last updated: 2020-03-17
+
+#Description:  #DTIPrep expects a project specific protocol file protocol.xml. This 
+               #ensures the scan collection parameters are the same across scans. 
+               #The protocol.xml file must be manually created, within DTIPrep 
+
+#Submission:   Use the DTIprep GUI interactively
+
+#Notes:        #Participant choices for participants on which protocols are based 
+               #were chosen from participants who passed DWI QC, randomly: 
+                    #CMP: CMP_0180
+                    #MRP: MRP_0081
+                    #ZHP: ZHP_0134
+                    #CMH: CMH_0135
+                    #MRC: MRC_0055
+                    #ZHH: ZHH_0021
+
+#As we are not using DTIPrep for processing, these protocols are not used in subsequent steps
+#The process is kept here for posterity
+
+####################################################################################
+
+#module load DTIPrep
+#DTIPrep
+#click `open nrrd` (left most folder icon)
+#select the nrrd from the target participant in `.../data/04_nrrd`
+#click the 'Protocol' tab
+#click `Default`
+    #if any warning popups, click 'OK'
+#review and change each parameter as required
+    #IMAGE_bCheck                               Yes
+    #DIFFUSION_bCheck                           Yes
+    #DENOISING_bCheck                           No
+    #SLICE_bCheck                               Yes
+    #INTERLACE_bCheck                           Yes
+    #BASELINE_bAverage                          Yes
+    #EDDYMOTION_bCorrect                        No
+    #GRADIENT_bCheck                            Yes
+    #JOINDENOISING_bCheck                       No
+    #BRAINMASK_bCheck                           Yes
+        #BRAINMASK_method                       1 (Slicer)
+    #DOMINANTDIRECTION_BCheck                   Yes
+    #DTI_bCompute                               Yes
+
+#Save As: the protocol.xml to `projects/ncalarco/thesis/SPINS/Slicer/data/05a_dtiprepProtocols/site_protocol.xml`
