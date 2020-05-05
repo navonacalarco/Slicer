@@ -17,6 +17,10 @@
                     #CMH: CMH_0135
                     #MRC: MRC_0055
                     #ZHH: ZHH_0021
+
+#As we are not using DTIPrep for processing, these protocols are not used in subsequent steps
+#The process is kept here for posterity
+
 ####################################################################################
 
 #module load DTIPrep
