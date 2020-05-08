@@ -49,7 +49,26 @@ export stem="$(basename $inputimage .nrrd)"
 export output_name="${outputdir}/${stem}"
 
 ####################################################################################
-#STEP 1: FIT THE TENSOR
+#STEP 1: MAKE A MASK
+####################################################################################
+ 
+#Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
+#GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
+#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
+#Time:          Fast
+
+Slicer --launch DiffusionWeightedVolumeMasking \
+  --removeislands \
+  ${inputimage} \
+  ${output_name}_B0.nrrd \
+  ${output_name}_MASK.nrrd
+
+#DEFAULT PARAMETERS: 
+#removeislands: true            Removes disconnected regions from brain mask
+#baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
+
+####################################################################################
+#STEP 2: FIT THE TENSOR
 ####################################################################################
 
 #Description:   Perform diffusion tensor estimation
@@ -59,14 +78,16 @@ export output_name="${outputdir}/${stem}"
 #Time:          Lengthy
 
 Slicer --launch DWIToDTIEstimation \
-  --inputVolume ${inputimage} \                      #input raw DWI (must be .nrrd, no floats)
-  --outputTensor ${output_name}_DTI.nrrd \           #estimated DTI volume
-  --outputBaseline ${output_name}_SCALAR.nrrd \      #estimated baseline (non-DW) volume (i.e., the b0)
-  --enumeration WLS \                                #weighted least squares
-  --shiftNeg
+  --enumeration WLS \
+  --shiftNeg \
+  --mask ${output_name}_MASK.nrrd \
+  ${inputimage} \
+  ${output_name}_DTI.nrrd \
+  ${output_name}_B0.nrrd
                                    
 #DEFAULT PARAMETERS: 
 #shiftNeg: false    If true, shift negative eigenvalues so that all are positive: this accounts for unuseable tensor solutions related to noise or acquisition error
+#enumeration: WLS   Weighted least squares
 
 #-----------------------------------------------------------------------------------
 #If running a test from home (MAC) on data on local computer:
@@ -86,26 +107,6 @@ Slicer --launch DWIToDTIEstimation \
 #done < ${base_path}/participantList.txt
 #-----------------------------------------------------------------------------------
 
-####################################################################################
-#STEP 2: MAKE A MASK
-####################################################################################
- 
-#Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
-#GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
-#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
-#Time:          Fast
-
-Slicer --launch DiffusionWeightedVolumeMasking \
-  --inputVolume ${inputimage} \
-  --outputBaseline ${output_name}_SCALAR.nrrd \
-  --thresholdMask ${output_name}_MASK.nrrd \
-  --removeislands \
-  --otsuomegathreshold 0.7
-
-#DEFAULT PARAMETERS: 
-#remoteislands: true            Removes disconnected regions from brain mask
-#baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
-#otsuomegathreshold: 0.5        Controls the sharpness threshold in the Otsu computation. 0 = lower threshold, 1 = higher threshold
 
 ####################################################################################
 #STEP 3: WHOLE BRAIN TRACTOGRAPHY
