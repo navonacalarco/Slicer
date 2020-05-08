@@ -79,6 +79,7 @@ Slicer --launch DiffusionWeightedVolumeMasking \
 
 Slicer --launch DWIToDTIEstimation \
   --enumeration WLS \
+  --mask ${output_name}_MASK.nrrd \
   ${inputimage} \
   ${output_name}_DTI.nrrd \
   ${output_name}_B0.nrrd
