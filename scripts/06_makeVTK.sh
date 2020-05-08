@@ -64,7 +64,7 @@ Slicer --launch DiffusionWeightedVolumeMasking \
   ${output_name}_MASK.nrrd
 
 #DEFAULT PARAMETERS: 
-#remoteislands: true            Removes disconnected regions from brain mask
+#removeislands: true            Removes disconnected regions from brain mask
 #baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
 
 ####################################################################################
