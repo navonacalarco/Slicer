@@ -1,0 +1,61 @@
+---
+title: "WMA review: Visualization of a particular tract"
+date written: '2020-05-05'
+last run: '`r Sys.Date()`'
+output: html_document
+---
+
+-----
+
+__Description__. We review a particular tract in the ORG atlas (here, the AF), as well as that same tract for a participant. 
+
+__(Pre)processing__. Data here has been preprocessed with new dmriprep, and uses current parameters delinated in [github.com/navonacalarco/Slicer](github.com/navonacalarco/Slicer).
+
+__Participants__. Here, we visualize data from the 'EXAMPLE' participant with the data in `/exampleData`. participant. Note: the 'EXAMPLE' participant is a HCP healthy control from a Slicer tutorial (note: this participant underwent two-tensor UKF tractography).
+
+-----
+
+__ORG atlas__. For reference, the ORG atlas has 11 (bilateral) fiber bundles that make up the AF (the final image is all combined):
+
+```{r, echo=FALSE,fig.align='center', results='asis'}
+
+#Note: I made these images in Slicer, using the native screenshot tool, and output them to a directory I made, called `tract_clusters/tractName` (here, AF). The background brain is the 'glassbrain.vtk'. Colours are Slicer defaults.
+
+#set the RELATIVE path variable to the location of your Slicer-generated QC .jpgs
+myPath = '../../../Documents/Slicer_testing/images/tract_clusters/AF'
+
+#make a list of all files in directory
+plots <- list.files(myPath)
+
+#loop to plot
+for(i in plots){
+      filename <- file.path(myPath, i)
+      (cat("![](",filename,"){width=25%}"))
+}
+
+```
+
+
+-----
+
+__Participant images__. Note: these images were created with the `whitematteranalysis` script `wm_quality_control_tractography.py`. 
+
+<br>
+<div align="center"> anterior --  | -- inferior  -- | -- left --  | -- posterior -- | -- right -- | -- superior  </div>
+
+EXAMPLE
+
+```{r, echo=FALSE,out.width="15%", out.height="20%",fig.cap=" ",fig.show='hold',fig.align='center'}
+
+#reset RELATIVE path to where Slicer QC outputs are
+myPath = '../../../Documents/Slicer_testing/05_QC/QC_06_anatomicalTracts/sub-EXAMPLE/tract_QC_T_AF_left'
+
+knitr::include_graphics(c(
+file.path(myPath, "view_ant_T_AF_left.jpg"),
+file.path(myPath, "view_inf_T_AF_left.jpg"),
+file.path(myPath, "view_left_T_AF_left.jpg"),
+file.path(myPath, "view_post_T_AF_left.jpg"),
+file.path(myPath, "view_right_T_AF_left.jpg"),
+file.path(myPath, "view_sup_T_AF_left.jpg")))
+
+``` 

@@ -1,0 +1,37 @@
+---
+title: "WMA review: Registration to the ORG atlas"
+date written: '2020-05-05'
+last run: '`r Sys.Date()`'
+output: html_document
+---
+
+-----
+
+__Description__. Note: these images were created with the `whitematteranalysis` script `wm_quality_control_tract_overlap.py `. Red = subject data, yellow = ORG atlas.
+
+__(Pre)processing__. Data here has been preprocessed with new dmriprep, and uses current parameters delinated in [github.com/navonacalarco/Slicer](github.com/navonacalarco/Slicer).
+
+__Participants__. Here, we visualize data from the 'EXAMPLE' participant with the data in `/exampleData`. participant. Note: the 'EXAMPLE' participant is a HCP healthy control from a Slicer tutorial (note: this participant underwent two-tensor UKF tractography).
+
+-----
+
+<br>
+<div align="center"> anterior --  | -- inferior  -- | -- left --  | -- posterior -- | -- right -- | -- superior  </div>
+
+EXAMPLE 
+
+```{r, echo=FALSE,fig.align='center', results='asis', warning=FALSE}
+
+#set the RELATIVE path variable to the location of your Slicer-generated QC .jpgs
+myPath = '../../../Documents/Slicer_testing/05_QC/QC_03_overlapPostRegistration/sub-EXAMPLE'
+
+#find the jps in that directory (note: will find all the .jps -- as we here want)
+plots <- list.files(myPath)
+
+#loop to plot
+for(i in plots){
+      filename <- file.path(myPath, i)
+      (cat("![](",filename,"){width=15%}", sep=''))
+}
+
+```

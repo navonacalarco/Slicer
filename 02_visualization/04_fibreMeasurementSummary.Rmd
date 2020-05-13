@@ -1,0 +1,388 @@
+---
+title: "SPINS tractography fibre measurement summary (Slicer)"
+output:
+  html_document:
+    df_print: paged
+---
+
+code written: 2020-01-12       
+last ran: `r Sys.Date()`   
+
+-----
+
+>Something has apparently gone very wrong; the data processing has (presumably) improved, but our white matter segmentation is worse than before. My Slurm job was interrupted but then resumed. Maybe this is the (a) source of our issues. Will have to run yet again...
+
+```{r include=FALSE}
+
+#clean environment
+rm(list = ls(all.names = TRUE))
+
+#libraries
+library(dplyr)
+library(stringr)
+library(kableExtra)
+library(DT)
+library(ggplot2)
+library(reshape2)
+library(assertr)
+
+#turn off scientific notation
+options(scipen=999)
+
+#read in data
+df <- read.csv(dir('../data', full.names=T, pattern="^FiberMeasurements_2020-03")) #needed to remove participants that failed QC
+slicerInfo <- read.csv(dir('../../../data/generated', full.names=T, pattern="^df_slicerInfo_"))
+participants  <- read.csv(dir('../../../data/generated', full.names=T, pattern="^df_clinicalCleanImputedTransformed_"))
+consort <- read.csv(dir('../../../data/generated', full.names=T, pattern="^df_2020"))
+qc <- read.csv(dir('../../../data/generated', full.names=T, pattern="^df_QC_automatedEddyMRTrixSCORED_")) #needed to remove participants that failed QC
+
+```
+
+```{r grapple with huge file, echo=FALSE, results='hide'}
+
+#reformat imaging ids
+df$participant_id <- paste0('SPN01_', substr(df$participant_id, 5, 7), '_', substr(df$participant_id, 8, 11))
+
+#remove rows from participants that aren't eligible
+df <- df[df$participant_id %in% consort$record_id,] #410 in consort
+
+#check participants 
+length(unique(df$participant_id)) #407  -- that's right, because I somehow lost 3...
+
+#who is missing between datasets
+setdiff(consort$record_id, df$participant_id)  #"SPN01_CMH_0007" "SPN01_CMH_0106" "SPN01_CMH_0107"
+
+#why are they missing? we know they have DWI data, need to follow up...
+#"SPN01_ZHP_0063" "SPN01_ZHP_0082" "SPN01_ZHP_0125" "SPN01_ZHP_0156" "SPN01_ZHP_0158"
+#"SPN01_ZHP_0159" "SPN01_ZHP_0160" "SPN01_ZHP_0161" "SPN01_ZHP_0163" "SPN01_ZHP_0165"
+#"SPN01_ZHP_0166" "SPN01_ZHP_0167" "SPN01_ZHP_0168" "SPN01_ZHP_0169" "SPN01_ZHP_0170"
+#"SPN01_ZHP_0171" "SPN01_ZHP_0172"
+
+#do we have anyone we shouldn't?
+setdiff(df$participant_id, participants$record_id) #no, great!
+
+#remove participants that failed QC
+qc_fail <- as.character(qc$record_id[which(qc$score > 1)])
+df <- df[!(df$participant_id %in% qc_fail),] #already been removed!
+
+#make a site variable
+df$site <- substr(df$participant_id, 7, 9)
+
+#make a smaller subset of participants variables
+participants <- participants[, c(
+  'record_id', 
+  'group', 
+  'age', 
+  'sex'
+)]
+
+#merge together dataframes
+df <- merge(df, participants, by.x='participant_id', by.y='record_id')
+
+#keep only participants that should be included
+df <- df[df$participant_id %in% consort$record_id,] #still 407... great!
+
+```
+
+```{r data cleaning, echo=FALSE, results='hide'}
+
+#In Slicer info document, replace spaces in tract name with the hyphen
+slicerInfo$short_names <- str_replace(slicerInfo$short_names, ' ', '-')
+
+#fix the commmissural tracts
+slicerInfo <-  slicerInfo %>% mutate(short_names = dplyr::recode(short_names,
+      `CC-1`='CC1', 
+      `CC-2` ='CC2', 
+      `CC-3`='CC3', 
+      `CC-4` ='CC4', 
+      `CC-5`='CC5', 
+      `CC-6` ='CC6', 
+      `CC-7` ='CC7'))
+
+#fix the IoFF
+slicerInfo$short_names <- ifelse(slicerInfo$short_names == 'IoFF', 'IOFF', slicerInfo$short_names)
+
+#make the comparison hybrid  of tract and hemisphere from the Slicer info document
+slicerInfo$tract <- paste(slicerInfo$short_names, '--', slicerInfo$hemisphere)
+
+#cut out the leading 'T_' constant from all region values
+df$region <- substring(df$region, 3)
+
+#manipulate the hemisphere variable so matches lookup from SlicerInfo
+df$hemisphereAbbr <- ifelse(df$hemisphere == 'commissural', 'C', 'LR')
+
+#make a new hybrid variable
+df$tractAbbr <- paste(df$region, '--', df$hemisphereAbbr)
+
+#make sure the same
+setdiff(slicerInfo$tract, df$tractAbbr) #great, no differences
+
+#now, check df for tracts that don't exist in Slicer -- these tracts in our data are:
+remove <- setdiff(df$tractAbbr, slicerInfo$tract) #these are made from errant fibres... need to check ... there's 16
+#"Intra-CBLM-I&P -- C" 
+#"CC1 -- LR"           
+#"CC2 -- LR"           
+#"CB -- C"             
+#"MCP -- LR"          
+#"CC3 -- LR"           
+#"Sup-PO -- C" 
+
+#remove these rows
+df <- df[!(df$tractAbbr %in% remove),] 
+
+#check didn't remove any participants, i.e., no participant only has erroneously segmented fibred
+length(unique(df$participant_id)) #still 407 -- great
+
+#double check number of tracts 
+length(unique(df$tractAbbr)) #great, should be 41
+
+#now, make a variable that makes clear which hemisphere the data are actually from
+df$tractSpecific <- paste(df$region, '--', df$hemisphere)
+
+#also add in full tract name
+df <- merge(df, slicerInfo[, c('tract', 'full_names')], by.x='tractAbbr', by.y='tract')
+
+#make a variable with one letter abbreviation of hemisphere
+df$hemisphereAbbrSpecific <- toupper(substring(df$hemisphere, 1, 1))
+
+#reformat
+df$tractPlot <- paste(df$region, '--', df$hemisphereAbbrSpecific)
+
+#write out the tract data -- long form
+write.csv(df, paste0('../../../data/generated/df_slicerFA_long_', Sys.Date(), '.csv', sep=''), row.names = F) #long format, #407 participants
+
+#also make wide format, with only minimal information
+df_wide <- df[, c('participant_id',
+                  'tractPlot',
+                  'tensors.FractionalAnisotropy.Mean')] 
+
+#replace spaces and special characters in what will be column names
+df_wide$tractPlot <- gsub(" -- ", "_", df_wide$tractPlot )
+
+#rename FA variable, as will be in colun name
+names(df_wide)[names(df_wide) == 'tensors.FractionalAnisotropy.Mean'] <- 'FA'
+
+#cast the new df
+df_wide <- reshape(df_wide, idvar = 'participant_id', timevar = 'tractPlot', direction='wide')
+
+#sort the dataframe by participant id
+df_wide <- df_wide[order(df_wide$participant_id),]
+
+#write out wide, minimal csv
+write.csv(df_wide, paste0('../../../data/generated/df_slicerFA_wide_', Sys.Date(), '.csv', sep=''), row.names = F) #wide format, still 407 participants
+
+```
+
+__Notes__: This script summarizes the key output values from Slicer, for all tracts. We have data for n=`r length(unique(df$tractAbbr))` tracts (n=`r length(unique(df$tractSpecific))` unique combinations with hemisphere). We expect to have data from n=41 tracts. 
+
+The data we have available is summarized below (collapsed across all sites):
+
+<br>
+
+```{r review data, echo=FALSE, warning=FALSE, message=FALSE}
+
+#count participant data
+participantCount <- length(unique(df$participant_id))
+
+#make a summary df 
+df_tbl <- df %>%
+  dplyr::group_by(full_names, region, hemisphereAbbrSpecific) %>%
+  dplyr::summarise(participantsWithValues = n(),
+      meanNum_Fibers=mean(Num_Fibers),
+      sdNum_Fibers=sd(Num_Fibers),
+      meanMean_Length=mean(Mean_Length),
+      sdMean_Length=sd(Mean_Length),
+      meanFA=mean(tensors.FractionalAnisotropy.Mean),
+      sdFA=sd(tensors.FractionalAnisotropy.Mean)) %>%
+  dplyr::mutate(per=paste0(round(100*participantsWithValues/participantCount ,2),'%'))
+
+#round all numeric values
+df_tbl <- df_tbl %>% mutate_if(is.numeric, round, digits=3)
+
+#make a pretty, sortable table
+DT::datatable(
+  df_tbl[, c(1:4, 11, 5:10)], #rearrange values
+  rownames = FALSE,
+  colnames = c(
+    'tract',
+    'tract abbreviation',
+    'hemi',
+    'count',
+    'percent',
+    'number of fibres (mean)',
+    'number of fibres (sd)',
+    'length of fibres (mean)',
+    'length of fibres (sd)',
+    'FA (mean)',
+    'FA (sd)'),
+  filter = 'top',
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    width = '50%',
+    columnDefs = list(list(className = 'dt-center', targets = 0:4))))
+
+```
+
+__Data summary.__  
+
+_Missing participants_. In total, we only have data from n=`r length(unique(df$participant_id))` participants, whereas n=`r length(unique(participants$record_id))` were expected (a difference of `r length(unique(df$participant_id)) - length(unique(participants$record_id))`.) The missing participants are `r setdiff(participants$record_id, df$participant_id)`; I need to follow up to understand why the pipeline failed (these participants do have DWI data that passed QC); I believe it's a queue / Slurm error.
+
+_Missing tracts._ The `count` variable in the table above indicates the number of participants with data for a given tract, and `percent` indicates corresponding percentage. We see that some tracts have data from far fewer participants than others. In total, we have data for `r sum(df_tbl$participantsWithValues)` tracts out of a possible maximum `r nrow(df_tbl) * length(unique(df$participant_id))`, i.e., `r sum(df_tbl$participantsWithValues) / (nrow(df_tbl) * length(unique(df$participant_id))) * 100`%. 
+
+_Missing tracts by site._ Before it looked as though tracts were missing by site. Now, it appears that this is less the case. But a very large number of tracts are missing: 
+
+<center>![](../../../imgs/siteLegend.png){width=250px}</center>
+
+```{r visualize, echo=FALSE, fig.width=9.5, fig.height=15}
+
+#sort the df by participant
+df_wide <- df_wide[order(df_wide$participant_id),]
+
+#copy df
+df_plt <- df_wide
+
+#if values aren't NA, change to 1
+df_plt[, 2:ncol(df_plt)] <- ifelse(is.na(df_plt[,2:ncol(df_plt)]), 0, 1)
+
+#determine indices for function
+CMH_begin <- unlist(grep('CMH', df_plt$participant_id)[1])
+CMP_begin <- unlist(grep('CMP', df_plt$participant_id)[1])
+MRC_begin <- unlist(grep('MRC', df_plt$participant_id)[1])
+MRP_begin <- unlist(grep('MRP', df_plt$participant_id)[1])
+ZHH_begin <- unlist(grep('ZHH', df_plt$participant_id)[1])
+ZHP_begin <- unlist(grep('ZHP', df_plt$participant_id)[1])
+ZHP_end <- nrow(df_plt)
+
+#melt dataframe
+df_plt <- melt(df_plt, id.vars = 'participant_id')
+
+#remove the FA constant from all of the variable values (former variable names)
+df_plt$variable <- substring(df_plt$variable, 4)
+
+#write a function for background colour
+geom_rect_fn <- function(xmin, xmax, colour){
+    geom_rect(data=data.frame(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill=colour, alpha=.6)
+}
+
+#run function
+bg_CMH <- geom_rect_fn(CMH_begin, CMP_begin, '#d53628')
+bg_CMP <- geom_rect_fn(CMP_begin, MRC_begin, '#9a4a55')
+bg_MRC <- geom_rect_fn(MRC_begin, MRP_begin, '#448ba1')
+bg_MRP <- geom_rect_fn(MRP_begin, ZHH_begin, '#8baea7')
+bg_ZHH <- geom_rect_fn(ZHH_begin, ZHP_begin, '#c99b2c')
+bg_ZHP <- geom_rect_fn(ZHP_begin, ZHP_end, '#e5bd31')
+
+#make tileplot
+ggplot(df_plt) +  
+  geom_tile(aes(x=participant_id, y=variable, fill=value)) + 
+  xlab('participant') +
+  ylab('') +
+  scale_fill_gradientn(colours = c("black", "white"), values = c(0,1)) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "none") +
+  bg_CMH + 
+  bg_CMP + 
+  bg_MRC + 
+  bg_MRP +
+  bg_ZHH +
+  bg_ZHP 
+
+```
+
+
+_Missing tracts by participant_. A large number of participants are missing several, as follows:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+#count which participants / how many participants contribute to the missing data
+missing <- as.data.frame(table(df$participant_id))
+
+#make a column for count of missing
+missing$missing <- length(unique(df$tractSpecific)) - missing$Freq 
+
+#summarize by frequency
+missing <- as.data.frame(table(missing$missing))
+
+#make a percentage column
+missing$percent <- round(as.numeric(as.character(missing$Var1)) / length(unique(df$tractSpecific)) * 100, 2)
+
+#update names
+names(missing) <- c('Tracts missing', 'Participant count', 'Percent missing')
+
+#transpose
+missing <- t(missing)
+
+#make pretty
+missing[c(1, 3, 2),] %>%
+  kable(align='c') %>%
+  kable_styling() %>%
+  scroll_box(width='100%')
+
+```
+
+-----
+
+__Visualization: Number of Fibers__. 
+
+The following plot shows the number of raw data for the `number of fibers` variable from the n=`r length(unique(df$participant_id))` participants summarized above, separated by tract and hemisphere (n=74) and coloured by site / scanner. Outlier values are apparent....
+
+<center>![](../../../imgs/siteLegend.png){width=250px}</center>
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+
+#FA values -- boxplots, faceted by tract, coloured by site
+plot_fn <- function(yvar){
+  
+#read yvar as text
+yvar <- eval(substitute(yvar), df)
+
+#feed data into ggplot 
+df %>% ggplot(aes(x=factor(0), y = get(yvar), fill=site)) +
+  
+  #add jittered points 
+  geom_point(aes(fill=site), alpha=.4, size=2, pch=21,
+             position = position_jitterdodge(seed = 1, dodge.width = 0.9)) +
+  
+  #overlay violin plot
+  geom_violin(aes(fill=site), trim = FALSE, color='black', alpha=.2,
+              position = position_dodge(width = 0.9)) +
+  
+  #set colours for sites
+  scale_fill_manual(values=c('#d53628','#9a4a55','#448ba1','#8baea7','#c99b2c','#e5bd31')) +
+
+  #specify plot appearance
+  theme_classic() +
+  ylab('') +
+  xlab('') +
+  theme(legend.position='none',
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.line=element_blank())  +
+  
+  #add facet
+  facet_wrap(~tractPlot, ncol=4, scales = "free")
+
+}
+
+```
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE, warning=FALSE, message=FALSE}
+#__Number of fibers__ 
+plot_fn('Num_Fibers')
+```
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE}
+#__Length of fibers __
+#plot_fn('Mean_Length')
+```
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE}
+#__FA.__
+#plot_fn('tensors.FractionalAnisotropy.Mean')
+```
+
+<br>

@@ -1,0 +1,231 @@
+---
+title: "WMA: Example summary of tractography fibre measurements"
+output:
+  html_document:
+    df_print: paged
+---
+
+code written: 2020-01-12       
+last ran: `r Sys.Date()`   
+
+-----
+
+```{r include=FALSE}
+
+#clean environment
+rm(list = ls(all.names = TRUE))
+
+#load libraries
+libraries <- c('dplyr', 'stringr', 'kableExtra', 'DT', 'ggplot2', 'reshape2', 'assertr') 
+lapply(libraries, require, character.only = T) 
+
+#turn off scientific notation
+options(scipen=999)
+
+#read in data
+df <- read.csv(dir('../data', full.names=T, pattern="^df_fiberMeasurements")) 
+slicerInfo <- read.csv(dir('../data', full.names=T, pattern="^df_slicerInfo_"))
+```
+
+```{r data cleaning, echo=FALSE, results='hide'}
+
+#make a site variable
+df$site <- substr(df$participant_id, 5, 7)
+
+#cut out the leading 'T_' constant from all region values
+df$region <- substring(df$region, 3)
+
+#manipulate the hemisphere variable so matches lookup from SlicerInfo
+df$hemisphereAbbr <- ifelse(df$hemisphere == 'commissural', 'C', 'LR')
+
+#make a new hybrid variable
+df$tractAbbr <- paste(df$region, '--', df$hemisphereAbbr)
+
+#now, make a variable that makes clear which hemisphere the data are actually from
+df$tractSpecific <- paste(df$region, '--', df$hemisphere)
+
+#also add in full tract name
+df <- merge(df, slicerInfo[, c('tract', 'full_names')], by.x='tractAbbr', by.y='tract')
+
+#make a variable with one letter abbreviation of hemisphere
+df$hemisphereAbbrSpecific <- toupper(substring(df$hemisphere, 1, 1))
+
+#reformat
+df$tractPlot <- paste(df$region, '--', df$hemisphereAbbrSpecific)
+
+```
+
+__Notes__: This script summarizes the key output values from Slicer, for all tracts. We have data for n=`r length(unique(df$tractAbbr))` tracts (n=`r length(unique(df$tractSpecific))` unique combinations with hemisphere). We expect to have data from n=41 tracts. 
+
+The data we have available is summarized below (collapsed across all sites):
+
+<br>
+
+```{r review data, echo=FALSE, warning=FALSE, message=FALSE}
+
+#make a summary df 
+df_tbl <- df %>%
+  dplyr::group_by(full_names, region, hemisphereAbbrSpecific) %>%
+  dplyr::summarise(participantsWithValues=n(),
+      meanNum_Fibers=mean(Num_Fibers),
+      sdNum_Fibers=sd(Num_Fibers),
+      meanMean_Length=mean(Mean_Length),
+      sdMean_Length=sd(Mean_Length),
+      meanFA=mean(tensors.FractionalAnisotropy.Mean),
+      sdFA=sd(tensors.FractionalAnisotropy.Mean)) %>%
+  dplyr::mutate(per=paste0(round(100*participantsWithValues/(length(unique(df$participant_id))), 2),'%'))
+
+#round all numeric values
+df_tbl <- df_tbl %>% mutate_if(is.numeric, round, digits=3)
+
+#make a pretty, sortable table
+DT::datatable(
+  df_tbl[, c(1:4, 11, 5:10)], #rearrange values
+  rownames = FALSE,
+  colnames = c(
+    'tract',
+    'tract abbreviation',
+    'hemi',
+    'count',
+    'percent',
+    'number of fibres (mean)',
+    'number of fibres (sd)',
+    'length of fibres (mean)',
+    'length of fibres (sd)',
+    'FA (mean)',
+    'FA (sd)'),
+  filter = 'top',
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    width = '50%',
+    columnDefs = list(list(className = 'dt-center', targets = 0:4))))
+
+```
+
+__Data summary.__  
+
+_Missing tracts._ The `count` variable in the table above indicates the number of participants with data for a given tract, and `percent` indicates corresponding percentage. In total, we have data for `r sum(df_tbl$participantsWithValues)` tracts out of a possible maximum `r nrow(df_tbl) * length(unique(df$participant_id))`, i.e., `r sum(df_tbl$participantsWithValues) / (nrow(df_tbl) * length(unique(df$participant_id))) * 100`%. 
+
+
+```{r visualize, echo=FALSE, fig.width=9.5, fig.height=15}
+
+#for visualizations, turn the data into wide format
+df_plt <- df[, c('participant_id',
+                  'tractPlot',
+                  'tensors.FractionalAnisotropy.Mean')] 
+
+#replace spaces and special characters in what will be column names
+df_plt$tractPlot <- gsub(" -- ", "_", df_plt$tractPlot )
+
+#rename FA variable, as will be in colun name
+names(df_plt)[names(df_plt) == 'tensors.FractionalAnisotropy.Mean'] <- 'FA'
+
+#cast the new df
+df_plt <- reshape(df_plt, idvar = 'participant_id', timevar = 'tractPlot', direction='wide')
+
+#sort the dataframe by participant id
+df_plt <- df_plt[order(df_plt$participant_id),]
+
+#if values aren't NA, change to 1
+df_plt[, 2:ncol(df_plt)] <- ifelse(is.na(df_plt[,2:ncol(df_plt)]), 0, 1)
+
+#melt dataframe
+df_plt <- melt(df_plt, id.vars = 'participant_id')
+
+#remove the FA constant from all of the variable values (former variable names)
+df_plt$variable <- substring(df_plt$variable, 4)
+
+#make tileplot
+ggplot(df_plt) +  
+  geom_tile(aes(x=participant_id, y=variable, fill=value)) + 
+  xlab('participant') +
+  ylab('') +
+  scale_fill_gradientn(colours = c("black", "white"), values = c(0,1)) +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "none") 
+
+```
+
+_Missing tracts by participant_. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+#count which participants / how many participants contribute to the missing data
+missing <- as.data.frame(table(df$participant_id))
+
+#make a column for count of missing
+missing$missing <- length(unique(df$tractSpecific)) - missing$Freq 
+
+#summarize by frequency
+missing <- as.data.frame(table(missing$missing))
+
+#make a percentage column
+missing$percent <- round(as.numeric(as.character(missing$Var1)) / length(unique(df$tractSpecific)) * 100, 2)
+
+#update names
+names(missing) <- c('Tracts missing', 'Participant count', 'Percent missing')
+
+#transpose
+missing <- t(missing)
+
+#make pretty
+missing[c(1, 3, 2),] %>%
+  kable(align='c') %>%
+  kable_styling() %>%
+  scroll_box(width='100%')
+
+```
+
+-----
+
+__Visualization: Number of Fibers__. 
+
+The following plot shows the number of raw data for the `number of fibers` variable from the n=`r length(unique(df$participant_id))` participants summarized above, separated by tract and hemisphere (n=74). Outlier values will be apparent.
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+
+#FA values -- boxplots, faceted by tract, coloured by site
+plot_fn <- function(yvar){
+  
+#read yvar as text
+yvar <- eval(substitute(yvar), df)
+
+#feed data into ggplot 
+df %>% ggplot(aes(x=factor(0), y = get(yvar), fill=site)) +
+  
+  #add jittered points 
+  geom_point(aes(fill=site), alpha=.4, size=2, pch=21,
+             position = position_jitterdodge(seed = 1, dodge.width = 0.9)) +
+  
+  #overlay violin plot
+  geom_violin(aes(fill=site), trim = FALSE, color='black', alpha=.2,
+              position = position_dodge(width = 0.9)) +
+  
+  #set colours for sites
+  #scale_fill_manual(values=c('#d53628','#9a4a55','#448ba1','#8baea7','#c99b2c','#e5bd31')) +
+
+  #specify plot appearance
+  theme_classic() +
+  ylab('') +
+  xlab('') +
+  theme(legend.position='none',
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.line=element_blank())  +
+  
+  #add facet
+  facet_wrap(~tractPlot, ncol=4, scales = "free")
+
+}
+
+```
+
+```{r fig.height=30, fig.width=9.5, echo=FALSE, warning=FALSE, message=FALSE}
+#__Number of fibers__ 
+plot_fn('Num_Fibers')
+```
+
+<br>

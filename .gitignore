@@ -1,3 +1,5 @@
 .Rhistory
 .python-version
 .DS_Store
+02_visualization/*.html
+03_analysis/data/df_fiber*
