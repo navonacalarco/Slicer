@@ -1,0 +1,3 @@
+__Required input__. These scripts require that the series of Slicer `whitematteranalysis` quality control scripts delineated by [01_scripts/09_qualityControl.sh](https://github.com/navonacalarco/Slicer/blob/master/01_scripts/09_qualityControl.sh)) be run.
+
+__Expected output__. Example reports for [wma_afterRegistration.Rmd](https://github.com/navonacalarco/Slicer/blob/master/02_visualization/01_visualization_wma_afterRegistration.Rmd), [wma_initialClusters.Rmd](https://github.com/navonacalarco/Slicer/blob/master/02_visualization/02_visualization_wma_initialClusters.Rmd), and [wma_specificTract.Rmd](https://github.com/navonacalarco/Slicer/blob/master/02_visualization/03_visualization_wma_specificTract.Rmd) are available on rpubs.
