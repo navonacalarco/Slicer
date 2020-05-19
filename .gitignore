@@ -4,4 +4,6 @@
 02_visualization/*.html
 03_analysis/data/df_fiber*
 03_analysis/notebooks/*.html
-saba_comparison/*
+04_comparison/saba_comparison.Rmd
+04_comparison/saba_documents
+04_comparison/saba_outputs
