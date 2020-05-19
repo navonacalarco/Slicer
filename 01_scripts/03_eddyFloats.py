@@ -23,7 +23,7 @@ module load python/3.8.1
 ipython
 
 #import packages
-import nibabel as nib
+import nibabel as nb
 import numpy as np
 import pandas as pd
 import os
@@ -33,8 +33,8 @@ from glob import glob
 mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT
 
 #define directory variables
-input_dir   = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
-output_dir  = "/projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT"
+input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
+output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT"
 
 #run conversion
 eddy_files = sorted(glob(f"{input_dir}/*nii.gz"))
