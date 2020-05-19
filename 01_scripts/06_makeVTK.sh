@@ -34,13 +34,10 @@ index() {
 }
 
 #load modules
-module load python/2.7.9-anaconda-2.1.0-150119
-module load slicer/4.8.1
-module load DTIPrep/1.2.8
+module load slicer/0,nightly
 
 #set up directories
 inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/04_nrrd'
-dtiprep_protocol='/projects/ncalarco/thesis/SPINS/Slicer/data/05_dtiprep_protocols'
 outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/06_vtk'
 
 #export environment variables
