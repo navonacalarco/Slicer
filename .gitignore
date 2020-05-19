@@ -3,3 +3,5 @@
 .DS_Store
 02_visualization/*.html
 03_analysis/data/df_fiber*
+03_analysis/notebooks/*.html
+saba_comparison/*
