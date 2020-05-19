@@ -5,5 +5,5 @@
 03_analysis/data/df_fiber*
 03_analysis/notebooks/*.html
 04_comparison/saba_comparison.Rmd
-04_comparison/saba_documents
-04_comparison/saba_outputs
+04_comparison/saba_documents/*
+04_comparison/saba_outputs/*
