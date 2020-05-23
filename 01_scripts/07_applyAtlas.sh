@@ -142,7 +142,10 @@ fi
 
 #OPTIONAL ARGUMENTS
 #-pthresh   The percent of a fiber that has to be in one hemisphere to consider the fiber as part of that hemisphere.
-#           The default number is 0.6. A higher number tends to label fewer fibers as hemispheric and more as commissural.
+#           The default number is 0.6. A higher number tends to label fewer fibers as hemispheric and more as commissural. 
+#           This parameter can be skipped when using a pre-provided atlas because a cluster location file that defines the
+#           commissural and hemispheric clusters is provided. 
+#           We use ''-clusterLocationFile'' to specify the path of the location file.
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 5 OF 9
