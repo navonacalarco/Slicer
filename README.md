@@ -11,15 +11,6 @@ __Requirements__. The scripts require (i) input data to be in BIDS format, and (
 
 __System and software info__. I have run all scripts on `kimel`. All software was accessed via the module system. Versions are denoted at the top of each script -- in most cases, the software is the 'latest' as of 05-2020.
 
-__Testing__. We tested some scripts on N=50 participants from the HCP dataset, stored on the SCC. To copy participants:
-```
-ls external/rprshnas01/hcp_downloads/Diffusion_Preprocessed/*.zip \
-   | head -n 50 \ #set n 
-   | while read zip
-     do unzip ${zip} -d /external/rprshnas01/tigrlab/scratch/ncalarco/HCP
-     done
-```
-
 __Important links__:  
 [ORG atlas](https://github.com/SlicerDMRI/ORG-Atlases)  
 [whitematteranalysis wiki](https://github.com/SlicerDMRI/whitematteranalysis/wiki)  
