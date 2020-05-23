@@ -63,6 +63,7 @@ mkdir -p $outputfolder
 #Directory created:   01_TractRegistration
 #Description:         Register each subject to the ORG800 atlas
 #Notes:               We are using rigid-affine registration (cf. affine + nonrigid), which is appropriate for our population. 
+#                     For HC populations, that have data similar in shape to the atlas, we would use a two-step registration of 'affine + nonrigid'
 #                     The created .tfm file is the transform matrix
 #Time:                Slow
 
@@ -152,10 +153,10 @@ fi
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   02/FiberClustering/TransformedClusters
-#Description:         This script applies the inverse transform matrix established in STEP 4, i.e., it transforms them to the input tractography space
+#Description:         This script applies the inverse transform matrix established in STEP 4, i.e., it transforms them to the input tractography (DWI) space
 #Time:                Fast
-#Note:                whitematteranalysis calls Slicer, and briefly opens the Slicer GUI
-#                     On MAC, change Slicer path to /Applications/Slicer.app/Contents/MacOS/Slicer
+#Note:                If we had used two-step registration in Step 1 (we did not), we would have to do a two-step transformation here, as well
+#                     whitematteranalysis calls Slicer, and briefly opens the Slicer GUI; on MAC, change Slicer path to /Applications/Slicer.app/Contents/MacOS/Slicer
 
 #transform fiber locations
 wm_harden_transform.py \
@@ -169,11 +170,12 @@ wm_harden_transform.py \
 #STEP 6 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   02_FiberClustering/SeparatedClusters, and three subdirectories 
+#Directory created:   02_FiberClustering/SeparatedClusters, and three subdirectories, in subject DWI space 
 #Description:         This script creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural) 
 #Time:                Fast    
 
 wm_separate_clusters_by_hemisphere.py \
+  -atlasMRML $atlasDirectory/clustered_tracts_display_100_percent.mrml 
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
   
