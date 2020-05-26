@@ -115,6 +115,9 @@ Slicer --launch DWIToDTIEstimation \
 #Description:   Whole brain tractography via label map seeding
 #GUI analogue:  Modules > Tractography Seeding
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/TractographyLabelMapSeeding
+#               See also issue https://github.com/SlicerDMRI/SlicerDMRI/issues/129, which confirms that 
+#               TractographyLabelMapSeeding (used here) in the command line and the interactive GUI module
+#               should lead to same results
 
 Slicer --launch TractographyLabelMapSeeding \
   ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
