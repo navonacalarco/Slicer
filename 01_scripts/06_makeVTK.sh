@@ -127,13 +127,13 @@ Slicer --launch TractographyLabelMapSeeding \
   --useindexspace 
 
 #DEFAULT PARAMETERS
-#start threhold (-c): .3                 Minimum Linear Measure for the seeding to start
-#minimum length (-l): 20                 Minimum length of the fibers (in mm)
-#maximum length (-m): 800                Maximum length of fibers (in mm)
-#thresholdmode: FA                       Tensor measurement used to start and stop the tractography
-#stopping curvature (-t): .7             Tractography will stop if radius of curvature becomes smaller than this number units are degrees per mm
-#integration step length (-i): .5        Distance between points on the same fiber in mm
-#use index space (-x): true              Seed at the IJK voxel
+#start threhold (-clthreshold): .3                       Minimum Linear Measure for the seeding to start
+#minimum length (-minimumlength): 20                     Minimum length of the fibers (in mm)
+#maximum length (-maximumlength): 800                    Maximum length of fibers (in mm)
+#thresholdmode: FA                                       Tensor measurement used to start and stop the tractography
+#stopping curvature (-stoppingcurvature): .7             Tractography will stop if radius of curvature becomes smaller than this number units are degrees per mm
+#integration step length (-integrationsteplength): .5    Distance between points on the same fiber in mm
+#use index space (-useindexspace): true                  Seed at the IJK voxel
 
 ####################################################################################
   
