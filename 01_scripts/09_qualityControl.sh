@@ -11,6 +11,7 @@
 
 #Notes:        #These scripts have positional arguments, so don't change order
                #These scripts call the whitematteranalysis package (cf. Slicer). This means that the commands can be run as is on a Mac (!); no need to change path
+               #However, if you have `pip install git+https://github.com/SlicerDMRI/whitematteranalysis.git` somewhere other than PWD, need to provide entire path
                #Documentation here: https://github.com/SlicerDMRI/whitematteranalysis/wiki/2c)-Running-the-Clustering-Pipeline-to-Cluster-a-Single-Subject-from-the-Atlas
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
                #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
