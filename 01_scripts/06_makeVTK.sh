@@ -134,6 +134,7 @@ Slicer --launch TractographyLabelMapSeeding \
 #stopping curvature (-stoppingcurvature): .7             Tractography will stop if radius of curvature becomes smaller than this number units are degrees per mm
 #integration step length (-integrationsteplength): .5    Distance between points on the same fiber in mm
 #use index space (-useindexspace): true                  Seed at the IJK voxel
+#label (-label): 1                                       Label value that defined seeding region
 
 ####################################################################################
   
