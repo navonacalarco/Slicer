@@ -27,11 +27,11 @@ for file in ./*/*QCReport.txt
     if [[ "$count" -ne 0 ]]
       then echo "This participant has failed automated dwiprep QC: $file"
     fi
-done > /projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/02_dwiprepQC_automatedFAILS.txt
+done > /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_dwiprepQC_automatedFAILS.txt
 
 #if required, remove data from failed participants 
 #rm -r /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/{...} #update subject IDs as required
 
 #write out included participants list
-ls /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep > /projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/03_sublist.txt	
+ls /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep > /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt	
 
