@@ -11,10 +11,14 @@
 
 #Notes: 
                #We need to convert all of the eddy-corrected images to 'ints', 
-               #i.e., remove the decimal place, as dtiprep doesn't allow for floats (???)
+               #i.e., remove the decimal place, as Slicer doesn't allow for floats 
                #This code takes a bit of time to run -- about 6 seconds per participant -- so about an hour for SPINS  
+               #Note: ipython is not a module; I have it installed locally on my machine (Franklin)
 
 ####################################################################################
+
+#make the directory for the output
+mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT
 
 #modules
 module load python/3.8.1
@@ -29,15 +33,12 @@ import pandas as pd
 import os
 from glob import glob
 
-#make the directory for the output
-mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT
-
 #define directory variables
-input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
+input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/"
 output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT"
 
 #run conversion
-eddy_files = sorted(glob(f"{input_dir}/*nii.gz"))
+brainsuite_files = sorted(glob(f"{input_dir}/*brainsuite_dwi.nii.gz"))
 for f in eddy_files:
 
     base_file = os.path.basename(f).replace("_desc-preproc_dwi.nii.gz", "")
