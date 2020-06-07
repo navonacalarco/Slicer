@@ -3,7 +3,7 @@
 ####################################################################################
 #Name:         03_eddyFloats.py
 
-#Last updated: 2020-03-17
+#Last updated: 2020-06-06
 
 #Description:  Remove decimal places from eddy-corrected images
 
@@ -30,11 +30,11 @@ import os
 from glob import glob
 
 #make the directory for the output
-mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT
+mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT
 
 #define directory variables
 input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
-output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/03_dmriprep_INT"
+output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT"
 
 #run conversion
 eddy_files = sorted(glob(f"{input_dir}/*nii.gz"))
