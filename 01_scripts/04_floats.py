@@ -41,8 +41,8 @@ output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT"
 brainsuite_files = sorted(glob(f"{input_dir}/*brainsuite_dwi.nii.gz"))
 for f in eddy_files:
 
-    base_file = os.path.basename(f).replace("_desc-preproc_dwi.nii.gz", "")
-    output_file = os.path.join(output_dir, base_file + "_eddy_fixed.nii.gz")
+    base_file = os.path.basename(f).replace("_desc-brainsuite_dwi.nii.gz", "")
+    output_file = os.path.join(output_dir, base_file + "_brainsuite_fixed.nii.gz")
 
     if not os.path.isfile(output_file):
         img = nb.load(f)
