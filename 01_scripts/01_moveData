@@ -43,10 +43,10 @@ find . -mindepth 3 -type d -empty #none are empty
 #if required, remove folders from participants with no data
 #rm -r /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/{sub-XXXXXXX,sub-XXXXXXX} #update subject IDs as required, no spaces
 
-#count participants that have eddy -- 475 (so, some participants have session 2 data, as more eddy files than directories)
+#count participants that have eddy -- 445 
 find /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/ -name '*desc-eddy_dwi.nii.gz' | wc -l
 
-#count participants that have brainsuite - 475 (same as eddy)
+#count participants that have brainsuite - 445 (same as eddy)
 find /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/ -name '*desc-brainsuite_dwi.nii.gz' | wc -l
 
 #write out these lists, to ensure have all expected data
