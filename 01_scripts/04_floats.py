@@ -34,12 +34,14 @@ import os
 from glob import glob
 
 #define directory variables
-input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/"
+input_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep"
 output_dir = "/projects/ncalarco/thesis/SPINS/Slicer/data/04_dmriprep_INT"
 
+#identify files
+brainsuite_files = sorted(glob(f"{input_dir}/*/*/*/*brainsuite_dwi.nii.gz"))
+
 #run conversion
-brainsuite_files = sorted(glob(f"{input_dir}/*brainsuite_dwi.nii.gz"))
-for f in eddy_files:
+for f in brainsuite_files:
 
     base_file = os.path.basename(f).replace("_desc-brainsuite_dwi.nii.gz", "")
     output_file = os.path.join(output_dir, base_file + "_brainsuite_fixed.nii.gz")
