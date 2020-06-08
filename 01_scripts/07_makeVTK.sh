@@ -12,6 +12,7 @@
                #If running on MAC, provide entire path to given Slicer script, e.g.:
                #/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/scriptName
                #See help with scriptName -h
+               #We decided to run tractography on a single computer instead of slurm
 ####################################################################################
 
 #load modules
