@@ -53,9 +53,15 @@ find /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/ -name '*de
 find /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/ -name '*desc-eddy_dwi.nii.gz' > /projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasEddy.txt
 find /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/*/*/dwi/ -name '*desc-brainsuite_dwi.nii.gz' > /projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/01_hasBrainsuite.txt
 
-#move over new brainsuite bvecs and bvals, separately
+#move over new brainsuite bvals
 file='/projects/ncalarco/thesis/SPINS/Slicer/outputs/01_hasData.txt'
 for subject in `cat $file`
 do
   cp /scratch/mjoseph/bids/SPINS/derivatives/dmriprep_orig/${subject}/*/dwi/*brainsuite_dwi.bval /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/${subject}/*/dwi/
+done 
+
+#move over new bvecs
+for subject in `cat $file`
+do
+  cp /scratch/mjoseph/bids/SPINS/derivatives/dmriprep_orig/${subject}/*/dwi/*brainsuite_dwi.bvec /projects/ncalarco/thesis/SPINS/Slicer/data/01_dmriprep/${subject}/*/dwi/
 done 
