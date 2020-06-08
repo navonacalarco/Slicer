@@ -1,6 +1,7 @@
 .Rhistory
 .python-version
 .DS_Store
+00_exampleData
 02_visualization/*.html
 03_analysis/data/df_fiber*
 03_analysis/notebooks/*.html
