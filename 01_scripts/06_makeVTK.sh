@@ -18,7 +18,7 @@
 ####################################################################################
 
 #SBATCH --partition=high-moby
-#SBATCH --array=1-454
+#SBATCH --array=1-439
 #SBATCH --nodes=1
 #SBATCH --time=20:00
 #SBATCH --export=ALL
