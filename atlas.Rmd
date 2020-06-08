@@ -1,0 +1,18 @@
+---
+title: "atlas"
+author: "Navona"
+date: '2020-05-23'
+output: html_document
+---
+
+The atlas can be created using our own data, or with the pre-provided atlas (ORG).
+
+The selected participants were:
+
+Parametesr. We have to decide between registered with different modes, including 'rigid_affine_fast', 'affine' and 'nonrigid' (b-spline). For tractography data that has relatively similar shape to the atlas, e.g., tractography computed from a healthy adult dataset, a two-step registration of 'affine+ nonrigid' is recommended: first running affine then running nonrigid afterwards with the affine output as input. For tractography data computed from a dataset, e.g. of a brain tumor patient and a very young clild, a single-step registration of 'rigid_affine_fast' is recommended. This is because this mode is more robust to the tractography data with different shape to the atlas. For example, shape of local fiber tracts can be changed by tumor and edema in a brain tumor patient dataset.
+
+```{r}
+
+```
+
+If the particpant was used in the atlas, they are alreayd registered, and do not need to be registered again.
