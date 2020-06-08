@@ -1,9 +1,9 @@
 #!/bin/bash -l
 
 ####################################################################################
-#Name:         #07_applyAtlas.sh
+#Name:         #08_applyAtlas.sh
 
-#Last updated: #2020-04-27
+#Last updated: #2020-06-08
 
 #Description:  #Runs all whitematteranalyses (registration to atlas, fiber bundling, etc)
 
@@ -36,7 +36,7 @@ module load whitematteranalysis/2020-04-24
 #get lists of subjects
 cd $SLURM_SUBMIT_DIR
 
-sublist="/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/03_sublist.txt"
+sublist="/projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt"
 
 index() {
    head -n $SLURM_ARRAY_TASK_ID $sublist \  #change to `head -n 1 $sublist` if want to test on one participant
@@ -46,7 +46,7 @@ index() {
 subject=`index`
 
 #define environment variables
-inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk             
+inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk/${subject}_SlicerTractography.vtk             
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
 #clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
@@ -93,7 +93,7 @@ fi
 
 if [ ! -e $outputfolder/02_FiberClustering/InitialClusters/${subject}'_reg' ]; then
 wm_cluster_from_atlas.py \
-  $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/${subject}'_eddy_fixed_SlicerTractography_reg.vtk' \
+  $outputfolder/01_TractRegistration/${subject}_SlicerTractography/output_tractography/${subject}'_SlicerTractography_reg.vtk' \
   $atlasDirectory \
   $outputfolder/02_FiberClustering/InitialClusters/
 else
@@ -116,7 +116,7 @@ fi
 if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' ]; then
 wm_cluster_remove_outliers.py \
   -cluster_outlier_std 4 \
-  $outputfolder/02_FiberClustering/InitialClusters/${subject}'_eddy_fixed_SlicerTractography_reg' \
+  $outputfolder/02_FiberClustering/InitialClusters/${subject}'_SlicerTractography_reg' \
   $atlasDirectory \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters
 else
@@ -133,9 +133,9 @@ fi
 #                     This information is used to separate the clusters after transforming them back to the input tractography space
 #Time:                Fast
 
-if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed'/cluster_location_by_hemisphere.log ]; then
+if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_SlicerTractography_reg_outlier_removed'/cluster_location_by_hemisphere.log ]; then
 wm_assess_cluster_location_by_hemisphere.py \
-  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_eddy_fixed_SlicerTractography_reg_outlier_removed' \
+  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_SlicerTractography_reg_outlier_removed' \
   -clusterLocationFile $atlasDirectory/cluster_hemisphere_location.txt
 else
   echo "wm_assess_cluster_location_by_hemisphere.py was already run on this subject!"
@@ -160,11 +160,11 @@ fi
 
 #transform fiber locations
 wm_harden_transform.py \
-  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
-  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography/ \
+  $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_SlicerTractography_reg_outlier_removed/ \
+  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_SlicerTractography/ \
   /opt/quarantine/slicer/nightly/build/Slicer \
   -i \
-  -t $outputfolder/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/itk_txform_${subject}_eddy_fixed_SlicerTractography.tfm
+  -t $outputfolder/01_TractRegistration/${subject}_SlicerTractography/output_tractography/itk_txform_${subject}SlicerTractography.tfm
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 6 OF 9
@@ -176,7 +176,7 @@ wm_harden_transform.py \
 
 wm_separate_clusters_by_hemisphere.py \
   -atlasMRML $atlasDirectory/clustered_tracts_display_100_percent.mrml 
-  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_eddy_fixed_SlicerTractography \
+  $outputfolder/02_FiberClustering/TransformedClusters/${subject}_SlicerTractography \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
   
 #--------------------------------------------------------------------------------------------------------------------
