@@ -127,4 +127,4 @@ done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
 ####################################################################################
 
 #make sure all data made it through
-ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk | wc
+ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk | wc #should have 445
