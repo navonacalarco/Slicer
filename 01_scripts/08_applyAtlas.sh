@@ -46,7 +46,7 @@ index() {
 subject=`index`
 
 #define environment variables
-inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk/${subject}_SlicerTractography.vtk             
+inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk/          
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
 #clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
@@ -70,9 +70,9 @@ mkdir -p $outputfolder
 if [ ! -e $outputfolder/01_TractRegistration/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
 wm_register_to_atlas_new.py \
   -mode rigid_affine_fast \
-  $inputfolder \                          #inputSubject
-  $atlas \                                #inputAtlas
-  $outputfolder/01_TractRegistration      #outputDirectory
+  $inputfolder/${subject}_SlicerTractography.vtk \   #inputSubject
+  $atlas \                                           #inputAtlas
+  $outputfolder/01_TractRegistration                 #outputDirectory
 else
   echo "wm_register_to_atlas_new.py was already run on this subject!"
 fi
