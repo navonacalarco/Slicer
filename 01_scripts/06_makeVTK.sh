@@ -32,6 +32,7 @@ mkdir -p ${outputdir}
 #GUI analogue:  Modules > Diffusion > Process > Diffusion Tensor Estimation
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DWIToDTIEstimation
 #Note:          Weighted least squares (cf. least squares) takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.
+#               Note also that, as written, the output goes to the `06_nrrd` directory
 #Time:          Lengthy
 
 while read subject
