@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####################################################################################
-#Name:         #05_makeNRRDs.sh
+#Name:         #06_makeNRRDs.sh
 
 #Last updated: #2020-06-07
 
@@ -33,7 +33,7 @@ awk '( $1 ~ /CMP|MRP|ZHP/ ) { print $1 > "05_sublistPrisma.txt" }; \
 data_dir="/projects/ncalarco/thesis/SPINS/Slicer/data"
 input_dir_dwi="${data_dir}/04_dmriprep_INT"
 input_dir_b="${data_dir}/01_dmriprep" 
-output_dir="${data_dir}/05_nrrd"
+output_dir="${data_dir}/06_nrrd"
 
 #make output directory
 mkdir -p $output_dir
