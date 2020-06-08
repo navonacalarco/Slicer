@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 ####################################################################################
-#Name:         06_makeVTK.sh
+#Name:         07_makeVTK.sh
 
 #Last updated: 2020-06-08
 
@@ -19,7 +19,7 @@
 module load slicer/0,nightly
 
 #set up directories
-inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/05_nrrd'
+inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/06_nrrd'
 outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk'
 
 #make output directory
