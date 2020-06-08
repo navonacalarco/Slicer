@@ -74,6 +74,7 @@ done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
 #Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
 #GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
 #Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
+#               Note also that, as written, the output goes to the `06_nrrd` directory
 #Time:          Fast
 
 while read subject
@@ -100,6 +101,7 @@ done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
 #               See also issue https://github.com/SlicerDMRI/SlicerDMRI/issues/129, which confirms that 
 #               TractographyLabelMapSeeding (used here) in the command line and the interactive GUI module
 #               should lead to same results
+#Time:          Lengthy
 
 while read subject
 do
@@ -110,7 +112,6 @@ Slicer --launch TractographyLabelMapSeeding \
   --stoppingvalue 0.10 \                                       #tractography will stop when measurements drop below this value: note default is .25
   --useindexspace 
 done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
-
 
 #DEFAULT PARAMETERS
 #start threhold (-clthreshold): .3                       Minimum Linear Measure for the seeding to start
