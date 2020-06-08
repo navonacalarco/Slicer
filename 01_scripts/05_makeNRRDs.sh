@@ -25,7 +25,9 @@ module load slicer/0,nightly
 module load SGE-extras/1.0
 
 #make a separate participant list for Simens and non-Siemens
-#use awk -- couldn't figure out so did it by hand
+awk '( $1 ~ /CMP|MRP|ZHP/ ) { print $1 > "05_sublistPrisma.txt" }; \
+     ( $1 ~ /CMH|MRC|ZHH/ ) { print $1 > "05_sublistNonprisma.txt" }' \
+    /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
 
 #define directory variables
 data_dir="/projects/ncalarco/thesis/SPINS/Slicer/data"
