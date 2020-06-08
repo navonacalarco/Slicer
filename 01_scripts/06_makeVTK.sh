@@ -3,7 +3,7 @@
 ####################################################################################
 #Name:         06_makeVTK.sh
 
-#Last updated: 2020-04-28
+#Last updated: 2020-06-08
 
 #Description:  Fits a tensor, makes a mask, and performs tractography
 
@@ -29,7 +29,7 @@
 
 cd $SLURM_SUBMIT_DIR
 
-sublist="/projects/ncalarco/thesis/SPINS/Slicer/txt_outputs/03_sublist.txt"
+sublist="/projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt"
 
 index() {
    head -n $SLURM_ARRAY_TASK_ID $sublist \
@@ -40,8 +40,11 @@ index() {
 module load slicer/0,nightly
 
 #set up directories
-inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/04_nrrd'
+inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/05_nrrd'
 outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/06_vtk'
+
+#make output directory
+mkdir -p ${outputdir}
 
 #export environment variables
 export inputimage="${inputdir}/`index`*.nrrd"
@@ -143,4 +146,4 @@ mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly
 find . -name '*_SlicerTractography.vtk' -exec mv -t ../07_vtkTractsOnly/ {} +
 
 #make sure all data made it through
-ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly | wc #449
+ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly | wc
