@@ -1,11 +1,11 @@
 #!/bin/bash -l
 
 ####################################################################################
-#Name:         #10_qualityControl.sh
+#Name:         #10_QC-fiberMeasurement.sh
 
 #Last updated: #2020-04-27
 
-#Description:  #Runs quality control on all steps in 07_applyAtlas.sh
+#Description:  #Runs quality control on all steps in 08_applyAtlas.sh
 
 #Submission:   #sbatch (remember to change the array to reflect number of participants)
 
@@ -33,7 +33,7 @@ module load whitematteranalysis/2020-04-24
 
 #define environment variables
 inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/
-outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/09_QC
+outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/10_QC
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
 
 #make output folder
@@ -49,7 +49,7 @@ mkdir -p $outputfolder
 #Time:
 
 wm_quality_control_tractography.py \
-  ${inputfolder}/07_vtkTractsOnly \
+  ${inputfolder}/07_vtk \
   ${outputfolder}/QC_01_tractography
   
 #--------------------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ wm_quality_control_tractography.py \
 
 wm_quality_control_tract_overlap.py \ 
   ${atlas} \
-  ${inputfolder}/07_vtkTractsOnly/${subject}_eddy_fixed_SlicerTractography.vtk \
+  ${inputfolder}/07_vtk/${subject}_SlicerTractography.vtk \
   ${outputfolder}/QC_02_overlapBeforeRegistration/${subject}/
 
 #--------------------------------------------------------------------------------------------------------------------
