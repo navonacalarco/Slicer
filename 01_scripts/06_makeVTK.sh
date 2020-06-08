@@ -7,34 +7,12 @@
 
 #Description:  Fits a tensor, makes a mask, and performs tractography
 
-#Submission:   sbatch
-
-#Notes: 
-               #For sbatch, remember to change the array to reflect number of participants
+#Notes:
                #These commands are part of SlicerDMRI proper (cf. white matter analysis) 
                #If running on MAC, provide entire path to given Slicer script, e.g.:
                #/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/scriptName
                #See help with scriptName -h
 ####################################################################################
-
-#SBATCH --partition=high-moby
-#SBATCH --array=1-439
-#SBATCH --nodes=1
-#SBATCH --time=20:00
-#SBATCH --export=ALL
-#SBATCH --job-name=Slicer
-#SBATCH --output=/projects/ncalarco/thesis/SPINS/Slicer/logs/run_%a.out
-#SBATCH --error=/projects/ncalarco/thesis/SPINS/Slicer/logs/run_%a.err
-#SBATCH --mem-per-cpu=1G
-
-cd $SLURM_SUBMIT_DIR
-
-sublist="/projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt"
-
-index() {
-   head -n $SLURM_ARRAY_TASK_ID $sublist \
-   | tail -n 1
-}
 
 #load modules
 module load slicer/0,nightly
@@ -46,32 +24,8 @@ outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/06_vtk'
 #make output directory
 mkdir -p ${outputdir}
 
-#export environment variables
-export inputimage="${inputdir}/`index`*.nrrd"
-export stem="$(basename $inputimage .nrrd)"
-export output_name="${outputdir}/${stem}"
-
 ####################################################################################
-#STEP 1: MAKE A MASK
-####################################################################################
- 
-#Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
-#GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
-#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
-#Time:          Fast
-
-Slicer --launch DiffusionWeightedVolumeMasking \
-  --removeislands \
-  ${inputimage} \
-  ${output_name}_B0.nrrd \
-  ${output_name}_MASK.nrrd
-
-#DEFAULT PARAMETERS: 
-#removeislands: true            Removes disconnected regions from brain mask
-#baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
-
-####################################################################################
-#STEP 2: FIT THE TENSOR
+#STEP 1: FIT THE TENSOR
 ####################################################################################
 
 #Description:   Perform diffusion tensor estimation
@@ -80,14 +34,16 @@ Slicer --launch DiffusionWeightedVolumeMasking \
 #Note:          Weighted least squares (cf. least squares) takes into account the noise characteristics of the MRI images to weight the DWI samples based on their intensity magnitude.
 #Time:          Lengthy
 
+while read subject
+do
 Slicer --launch DWIToDTIEstimation \
   --enumeration WLS \
   --shiftNeg \
-  --mask ${output_name}_MASK.nrrd \
-  ${inputimage} \
-  ${output_name}_DTI.nrrd \
-  ${output_name}_B0.nrrd
-                                   
+  ${inputdir}/${subject}.nrrd \
+  ${inputdir}/${subject}_DTI.nrrd \
+  ${inputdir}/${subject}_SCALAR.nrrd
+done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
+                              
 #DEFAULT PARAMETERS: 
 #shiftNeg: false    If true, shift negative eigenvalues so that all are positive: this accounts for unuseable tensor solutions related to noise or acquisition error
 #enumeration: WLS   Weighted least squares
@@ -110,6 +66,28 @@ Slicer --launch DWIToDTIEstimation \
 #done < ${base_path}/participantList.txt
 #-----------------------------------------------------------------------------------
 
+####################################################################################
+#STEP 2: MAKE A MASK
+####################################################################################
+ 
+#Description:   Make a mask within Slicer for tractography seeding (required for whole brain)
+#GUI analogue:  Modules > Diffusion > Process > Diffusion Brain Masking
+#Documentation: https://www.slicer.org/wiki/Documentation/Nightly/Modules/DiffusionWeightedVolumeMasking
+#Time:          Fast
+
+while read subject
+do
+Slicer --launch DiffusionWeightedVolumeMasking \
+  --removeislands \
+  ${inputdir}/${subject}.nrrd \
+  ${inputdir}/${subject}_SCALAR.nrrd \
+  ${inputdir}/${subject}_MASK.nrrd
+done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
+
+
+#DEFAULT PARAMETERS: 
+#removeislands: true            Removes disconnected regions from brain mask
+#baselineBValueThreshold: 100   Volumes with B-value below this threshold will be considered baseline images and included in mask calculation
 
 ####################################################################################
 #STEP 3: WHOLE BRAIN TRACTOGRAPHY
@@ -122,12 +100,16 @@ Slicer --launch DWIToDTIEstimation \
 #               TractographyLabelMapSeeding (used here) in the command line and the interactive GUI module
 #               should lead to same results
 
+while read subject
+do
 Slicer --launch TractographyLabelMapSeeding \
-  ${output_name}_DTI.nrrd \                                   #DTI volume in which to generate tractography
-  --inputroi ${output_name}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
-  ${output_name}_SlicerTractography.vtk \                     #name of tractography result
+  ${inputdir}/${subject}_DTI.nrrd \                                   #DTI volume in which to generate tractography
+  --inputroi ${inputdir}/${subject}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
+  ${outputdir}_SlicerTractography.vtk \                     #name of tractography result
   --stoppingvalue 0.10 \                                       #tractography will stop when measurements drop below this value: note default is .25
   --useindexspace 
+done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
+
 
 #DEFAULT PARAMETERS
 #start threhold (-clthreshold): .3                       Minimum Linear Measure for the seeding to start
