@@ -20,7 +20,7 @@ module load slicer/0,nightly
 
 #set up directories
 inputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/05_nrrd'
-outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/06_vtk'
+outputdir='/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk'
 
 #make output directory
 mkdir -p ${outputdir}
@@ -109,7 +109,7 @@ do
 Slicer --launch TractographyLabelMapSeeding \
   ${inputdir}/${subject}_DTI.nrrd \                                   #DTI volume in which to generate tractography
   --inputroi ${inputdir}/${subject}_MASK.nrrd \                       #label map defining region for seeding tractography (i.e., the mask)
-  ${outputdir}_SlicerTractography.vtk \                     #name of tractography result
+  ${outputdir}/${subject}_SlicerTractography.vtk \                     #name of tractography result
   --stoppingvalue 0.10 \                                       #tractography will stop when measurements drop below this value: note default is .25
   --useindexspace 
 done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
@@ -125,10 +125,6 @@ done < /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt
 #label (-label): 1                                       Label value that defined seeding region
 
 ####################################################################################
-  
-#once this script has run, for ease, move over just the tractography files to a separate (flat) directory
-mkdir -p /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly
-find . -name '*_SlicerTractography.vtk' -exec mv -t ../07_vtkTractsOnly/ {} +
 
 #make sure all data made it through
-ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtkTractsOnly | wc
+ls /projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk | wc
