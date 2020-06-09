@@ -43,7 +43,7 @@ sublist=`cat /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt`
 
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 1 OF 8
+#STEP 1 OF 6
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:   10_QC/QC_01_tractography
@@ -59,7 +59,7 @@ for subject in $sublist; do
 done
   
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 2 OF 8
+#STEP 2 OF 6
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:  10_QC/QC_02_overlapPreRegistration
@@ -73,7 +73,7 @@ wm_quality_control_tract_overlap.py \
 done < ${sublist}
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 3 OF 8
+#STEP 3 OF 6
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:  10_QC/QC_03_overlapPostRegistration
@@ -87,8 +87,8 @@ wm_quality_control_tract_overlap.py \
 done
 
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 4 OF 8        | OPTIONAL TO RUN / REVIEW
-#--------------------------------------------------------------------------------------------------------------------
+#STEP 4 OF 6        | OPTIONAL TO RUN / REVIEW
+#-------------------------------------------------------------------------------------------------------------------
 
 #Directory created:  10_QC/QC_04_clusterFromAtlas
 #Description:        Creates n=800 fiber clusters, before outliers have been removed (all grey, and 6 views available)   
@@ -100,7 +100,7 @@ wm_quality_control_tractography.py \
   $outputfolder/QC_04_clusterFromAtlas/${subject}
   
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 5 OF 8       | OPTIONAL TO RUN / REVIEW
+#STEP 5 OF 6       | OPTIONAL TO RUN / REVIEW
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:  10_QC/QC_05_noOutliers
@@ -112,7 +112,7 @@ wm_quality_control_tractography.py \
   $outputfolder/QC_05_noOutliers/${subject}
   
 #--------------------------------------------------------------------------------------------------------------------
-#STEP 6 OF 8       
+#STEP 6 OF 6       
 #--------------------------------------------------------------------------------------------------------------------
 
 #Directory created:  10_QC/QC_06_anatomicalTracts
@@ -123,26 +123,3 @@ wm_quality_control_tractography.py \
   $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \ 
   $outputfolder/QC_06_anatomicalTracts
   
-#--------------------------------------------------------------------------------------------------------------------
-#STEP 7 OF 8    NOT WORKING
-#--------------------------------------------------------------------------------------------------------------------
-
-#Directory created:  NA (run interactively)
-#Description:        To find outliers in measurements (and issues like different headers)
-
-wm_quality_control_cluster_measurements.py \
-  $inputfolder/08_registered/04_DiffusionMeasurements \
-  -outlier_std 3
-  
-#--------------------------------------------------------------------------------------------------------------------
-#STEP 8 OF 8    OPTIONAL -- INCOMPLETE  
-#--------------------------------------------------------------------------------------------------------------------  
-
-#Directory created:  10_QC/09_sharedScene
-#Description:        Creates a single .mrml (scene) file combining all input .vtks  -- essentially showing a tract across all participants
-#Time:               Short
-#Note:               Each .vtk file that is combined in the scene will be represented as a 'node' in the scene file
-#                    Need to figure out how to append subject name to 03_AnatomicalTracts and move TOI into separate directory
-
-wm_create_mrml_file.py tract_directory/
-
