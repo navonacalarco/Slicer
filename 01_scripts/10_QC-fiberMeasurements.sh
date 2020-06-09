@@ -65,12 +65,12 @@ done
 #Directory created:  10_QC/QC_02_overlapPreRegistration
 #Description:        Show overlap of input tractography (red) and the atlas (yellow) before registration
 
-while read subject; do
+for subject in $sublist; do
 wm_quality_control_tract_overlap.py \ 
   ${atlas} \
   ${inputfolder}/07_vtk/${subject}_SlicerTractography.vtk \
   ${outputfolder}/QC_02_overlapBeforeRegistration/${subject}/
-done < ${sublist}
+done
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 3 OF 6
@@ -95,9 +95,11 @@ done
 #Note:               Note that the wm_cluster_from_atlas.py script creates jpgs in 02_FiberClustering/InitialClusters/
 #Time:               Long
 
+for subject in $sublist; do
 wm_quality_control_tractography.py \
   $inputfolder/08_registered/02_FiberClustering/InitialClusters/${subject}_eddy_fixed_SlicerTractography_reg/ \ 
   $outputfolder/QC_04_clusterFromAtlas/${subject}
+done
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 5 OF 6       | OPTIONAL TO RUN / REVIEW
@@ -107,9 +109,11 @@ wm_quality_control_tractography.py \
 #Description:        Creates n=800 fiber clusters, after outliers have been removed (all grey, and 6 views available)   
 #Time:               Long
 
+for subject in $sublist; do
 wm_quality_control_tractography.py \
   $inputfolder/08_registered/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
   $outputfolder/QC_05_noOutliers/${subject}
+done
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 6 OF 6       
@@ -119,7 +123,8 @@ wm_quality_control_tractography.py \
 #Description:        Creates n=41 anatomical tracts, after outliers have been removed (all grey, and 6 views available)   
 #Time:               Long
 
+for subject in $sublist; do
 wm_quality_control_tractography.py \
   $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \ 
   $outputfolder/QC_06_anatomicalTracts
-  
+done 
