@@ -25,15 +25,6 @@
 #               `for x in ./*.vtk; do; mkdir "${x%.*}" && mv "$x" "${x%.*}"; done`
 ####################################################################################
 
-#SBATCH --array=18268
-#SBATCH --cpus-per-task=1
-#SBATCH --error=/projects/ncalarco/thesis/SPINS/Slicer/logs/SlicerQC/SlicerQC_%A_%a.err
-#SBATCH --output=/projects/ncalarco/thesis/SPINS/Slicer/logs/SlicerQC/SlicerQC_%A_%a.out
-#SBATCH --job-name=SlicerQC2_%j
-
-#purge modules in my environment -- affecting queue...
-module purge
-
 #load required modules
 module load python/3.6.3-anaconda-5.0.1
 module load slicer/0,nightly 
@@ -47,36 +38,45 @@ atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vt
 #make output folder
 mkdir -p $outputfolder
 
+#subject list
+sublist=`cat /projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt`
+
+
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 1 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   10_QC/01_tractography
+#Directory created:   10_QC/QC_01_tractography
 #Description:         QC tractography across all participants (catch early errors in tractography)
 #Notes:               Expected output: html; whole brain, 6 views, all grey
-#Time:
+#Time:                Fast
 
-wm_quality_control_tractography.py \
-  ${inputfolder}/ \
-  ${outputfolder}/QC_01_tractography
+for subject in $sublist; do
+ inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/10_QC/QC_00_rawVTK/${subject}_SlicerTractography
+ wm_quality_control_tractography.py \
+   ${inputfolder} \
+   ${outputfolder}/QC_01_tractography
+done
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 2 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/02_overlapPreRegistration
+#Directory created:  10_QC/QC_02_overlapPreRegistration
 #Description:        Show overlap of input tractography (red) and the atlas (yellow) before registration
 
+while read subject; do
 wm_quality_control_tract_overlap.py \ 
   ${atlas} \
   ${inputfolder}/${subject}_SlicerTractography.vtk \
   ${outputfolder}/QC_02_overlapBeforeRegistration/${subject}/
+done < ${sublist}
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 3 OF 8
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/03_overlapPostRegistration
+#Directory created:  10_QC/QC_03_overlapPostRegistration
 #Description:        Show overlap of input tractography (red) and the atlas (yellow) after registration
 
 wm_quality_control_tract_overlap.py \
@@ -88,7 +88,7 @@ wm_quality_control_tract_overlap.py \
 #STEP 4 OF 8        | OPTIONAL TO RUN / REVIEW
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/04_clusterFromAtlas
+#Directory created:  10_QC/QC_04_clusterFromAtlas
 #Description:        Creates n=800 fiber clusters, before outliers have been removed (all grey, and 6 views available)   
 #Note:               Note that the wm_cluster_from_atlas.py script creates jpgs in 02_FiberClustering/InitialClusters/
 #Time:               Long
@@ -101,7 +101,7 @@ wm_quality_control_tractography.py \
 #STEP 5 OF 8       | OPTIONAL TO RUN / REVIEW
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/05_noOutliers
+#Directory created:  10_QC/QC_05_noOutliers
 #Description:        Creates n=800 fiber clusters, after outliers have been removed (all grey, and 6 views available)   
 #Time:               Long
 
@@ -113,7 +113,7 @@ wm_quality_control_tractography.py \
 #STEP 6 OF 8       
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:  10_QC/06_anatomicalTracts
+#Directory created:  10_QC/QC_06_anatomicalTracts
 #Description:        Creates n=41 anatomical tracts, after outliers have been removed (all grey, and 6 views available)   
 #Time:               Long
 
