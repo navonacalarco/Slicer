@@ -179,23 +179,29 @@ done
 #Time:                Fast    
 
 #left
+for subject in $sublist; do
 wm_diffusion_measurements.py \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_left_hemisphere/ \
   $outputfolder/04_DiffusionMeasurements/${subject}_left_hemisphere_clusters.csv \
   /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
   #/Applications/Slicer.app/Contents/Extensions-28257/SlicerDMRI/lib/Slicer-4.10/cli-modules/FiberTractMeasurements
-  
+done
+
 #right
+for subject in $sublist; do
 wm_diffusion_measurements.py \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_right_hemisphere/ \
   $outputfolder/04_DiffusionMeasurements/${subject}_right_hemisphere_clusters.csv \
   /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+done
   
 #commissural
+for subject in $sublist; do
 wm_diffusion_measurements.py \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}/tracts_commissural/ \
   $outputfolder/04_DiffusionMeasurements/${subject}_commissural_clusters.csv \
   /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
+done
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 9 OF 9
@@ -206,9 +212,10 @@ wm_diffusion_measurements.py \
 #Time:                Fast    
 
 #anatomical tracts
+for subject in $sublist; do
 wm_diffusion_measurements.py \
   $outputfolder/03_AnatomicalTracts/${subject} \
   $outputfolder/04_DiffusionMeasurements/${subject}_anatomical_tracts.csv \
   /opt/quarantine/slicer/nightly/build/lib/Slicer-4.9/cli-modules/FiberTractMeasurements
-
+done
 
