@@ -150,7 +150,6 @@ done
 
 for subject in $sublist; do
 wm_separate_clusters_by_hemisphere.py \
-  -atlasMRML $atlasDirectory/clustered_tracts_display_100_percent.mrml 
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_SlicerTractography \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
 done
