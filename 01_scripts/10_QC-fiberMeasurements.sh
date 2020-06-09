@@ -32,7 +32,7 @@ module load slicer/0,nightly
 module load whitematteranalysis/2020-04-24
 
 #define environment variables
-inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/
+inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/10_QC
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
 
@@ -49,7 +49,7 @@ mkdir -p $outputfolder
 #Time:
 
 wm_quality_control_tractography.py \
-  ${inputfolder}/07_vtk \
+  ${inputfolder}/ \
   ${outputfolder}/QC_01_tractography
   
 #--------------------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ wm_quality_control_tractography.py \
 
 wm_quality_control_tract_overlap.py \ 
   ${atlas} \
-  ${inputfolder}/07_vtk/${subject}_SlicerTractography.vtk \
+  ${inputfolder}/${subject}_SlicerTractography.vtk \
   ${outputfolder}/QC_02_overlapBeforeRegistration/${subject}/
 
 #--------------------------------------------------------------------------------------------------------------------
