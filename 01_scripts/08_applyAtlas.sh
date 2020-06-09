@@ -17,41 +17,21 @@
                #To see the help file, type `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
 ####################################################################################
 
-#SBATCH --partition=high-moby
-#SBATCH --nodes=1
-#SBATCH --time=6:00:00
-#SBATCH --export=ALL
-#SBATCH --job-name Slicer
-#SBATCH --output=/projects/ncalarco/thesis/SPINS/Slicer/logs/run_%a.out
-#SBATCH --error=/projects/ncalarco/thesis/SPINS/Slicer/logs/run_%a.err
-#SBATCH --mem-per-cpu=36864
-#SBATCH --cpus-per-task=1
-#SBATCH --array=1-445
-
 #load modules 
 module load python/3.6.3-anaconda-5.0.1
 module load slicer/0,nightly 
 module load whitematteranalysis/2020-04-24
 
-#get lists of subjects
-cd $SLURM_SUBMIT_DIR
-
 sublist="/projects/ncalarco/thesis/SPINS/Slicer/outputs/03_sublist.txt"
-
-index() {
-   head -n $SLURM_ARRAY_TASK_ID $sublist \  #change to `head -n 1 $sublist` if want to test on one participant
-   | tail -n 1
-}
-
-subject=`index`
 
 #define environment variables
 inputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/07_vtk/          
 outputfolder=/projects/ncalarco/thesis/SPINS/Slicer/data/08_registered
 atlas=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/atlas.vtp
+atlasDirectory=`dirname $atlas`
+
 #clusteredmrml=/projects/ncalarco/thesis/SPINS/Slicer/atlas/ORG-800FC-100HCP-1.0/clustered_tracts_display_100_percent.mrml         
 #tractsfile=/projects/ncalarco/thesis/SPINS/Slicer/documentation/tract_names.csv
-atlasDirectory=`dirname $atlas`
 
 #make output folder
 mkdir -p $outputfolder
@@ -67,15 +47,13 @@ mkdir -p $outputfolder
 #                     The created .tfm file is the transform matrix
 #Time:                Slow
 
-if [ ! -e $outputfolder/01_TractRegistration/${subject}/output_tractography/${subject}'_reg.vtk' ]; then
+for subject in $sublist; do
 wm_register_to_atlas_new.py \
   -mode rigid_affine_fast \
-  $inputfolder/${subject}_SlicerTractography.vtk \   #inputSubject
-  $atlas \                                           #inputAtlas
-  $outputfolder/01_TractRegistration                 #outputDirectory
-else
-  echo "wm_register_to_atlas_new.py was already run on this subject!"
-fi
+  $inputfolder/${subject}_SlicerTractography.vtk \
+  $atlas \
+  $outputfolder/01_TractRegistration
+done
 
 #OPTIONAL ARGUMENTS
 #-f     number of fibers      Number of fibers to analyze. Default is 20,000
@@ -91,14 +69,12 @@ fi
 #Note:                Previously had flag for `-l 20`
 #Time:                Fast
 
-if [ ! -e $outputfolder/02_FiberClustering/InitialClusters/${subject}'_reg' ]; then
+for subject in $sublist; do
 wm_cluster_from_atlas.py \
   $outputfolder/01_TractRegistration/${subject}_SlicerTractography/output_tractography/${subject}'_SlicerTractography_reg.vtk' \
   $atlasDirectory \
   $outputfolder/02_FiberClustering/InitialClusters/
-else
-  echo "wm_cluster_from_atlas_new.py was already run on this subject!"
-fi
+done
 
 #OPTIONAL ARGUMENTS
 #-f   Number of fibers; default is all fibers
@@ -113,15 +89,13 @@ fi
 #Time:                Slow
 #Notes:               See a lot of "cluster is empty in subject". There are very few such messages in example data.
 
-if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_reg_outlier_removed' ]; then
+for subject in $sublist; do
 wm_cluster_remove_outliers.py \
   -cluster_outlier_std 4 \
   $outputfolder/02_FiberClustering/InitialClusters/${subject}'_SlicerTractography_reg' \
   $atlasDirectory \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters
-else
-  echo "wm_cluster_remove_outliers.py was already run on this subject!"
-fi
+done
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 4 OF 9
@@ -133,13 +107,11 @@ fi
 #                     This information is used to separate the clusters after transforming them back to the input tractography space
 #Time:                Fast
 
-if [ ! -e $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_SlicerTractography_reg_outlier_removed'/cluster_location_by_hemisphere.log ]; then
+for subject in $sublist; do
 wm_assess_cluster_location_by_hemisphere.py \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}'_SlicerTractography_reg_outlier_removed' \
   -clusterLocationFile $atlasDirectory/cluster_hemisphere_location.txt
-else
-  echo "wm_assess_cluster_location_by_hemisphere.py was already run on this subject!"
-fi
+done
 
 #OPTIONAL ARGUMENTS
 #-pthresh   The percent of a fiber that has to be in one hemisphere to consider the fiber as part of that hemisphere.
@@ -152,19 +124,21 @@ fi
 #STEP 5 OF 9
 #--------------------------------------------------------------------------------------------------------------------
 
-#Directory created:   02/FiberClustering/TransformedClusters
+#Directory created:   02_FiberClustering/TransformedClusters
 #Description:         This script applies the inverse transform matrix established in STEP 4, i.e., it transforms them to the input tractography (DWI) space
 #Time:                Fast
 #Note:                If we had used two-step registration in Step 1 (we did not), we would have to do a two-step transformation here, as well
 #                     whitematteranalysis calls Slicer, and briefly opens the Slicer GUI; on MAC, change Slicer path to /Applications/Slicer.app/Contents/MacOS/Slicer
 
 #transform fiber locations
+for subject in $sublist; do
 wm_harden_transform.py \
   $outputfolder/02_FiberClustering/OutlierRemovedClusters/${subject}_SlicerTractography_reg_outlier_removed/ \
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_SlicerTractography/ \
   /opt/quarantine/slicer/nightly/build/Slicer \
   -i \
-  -t $outputfolder/01_TractRegistration/${subject}_SlicerTractography/output_tractography/itk_txform_${subject}SlicerTractography.tfm
+  -t $outputfolder/01_TractRegistration/${subject}_SlicerTractography/output_tractography/itk_txform_${subject}_SlicerTractography.tfm
+done
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 6 OF 9
@@ -174,10 +148,12 @@ wm_harden_transform.py \
 #Description:         This script creates .vtps of all the n=800 tracts by hemisphere (left, right, commissural) 
 #Time:                Fast    
 
+for subject in $sublist; do
 wm_separate_clusters_by_hemisphere.py \
   -atlasMRML $atlasDirectory/clustered_tracts_display_100_percent.mrml 
   $outputfolder/02_FiberClustering/TransformedClusters/${subject}_SlicerTractography \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject}
+done
   
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 7 OF 9
@@ -188,10 +164,12 @@ wm_separate_clusters_by_hemisphere.py \
 #Time:                Fast    
 #Note:                 
 
+for subject in $sublist; do
 wm_append_clusters_to_anatomical_tracts.py \
   $outputfolder/02_FiberClustering/SeparatedClusters/${subject} \
   $atlasDirectory/ \
   $outputfolder/03_AnatomicalTracts/${subject}
+done
 
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 8 OF 9
