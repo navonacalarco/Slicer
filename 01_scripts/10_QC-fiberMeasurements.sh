@@ -79,11 +79,13 @@ done < ${sublist}
 #Directory created:  10_QC/QC_03_overlapPostRegistration
 #Description:        Show overlap of input tractography (red) and the atlas (yellow) after registration
 
+for subject in $sublist; do
 wm_quality_control_tract_overlap.py \
   ${atlas} \
-  ${inputfolder}/08_registered/01_TractRegistration/${subject}_eddy_fixed_SlicerTractography/output_tractography/${subject}_eddy_fixed_SlicerTractography_reg.vtk \
+  ${inputfolder}/08_registered/01_TractRegistration/${subject}_SlicerTractography/output_tractography/${subject}_SlicerTractography_reg.vtk \
   ${outputfolder}/QC_03_overlapPostRegistration/${subject}/
-  
+done
+
 #--------------------------------------------------------------------------------------------------------------------
 #STEP 4 OF 8        | OPTIONAL TO RUN / REVIEW
 #--------------------------------------------------------------------------------------------------------------------
