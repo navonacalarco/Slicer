@@ -15,6 +15,14 @@
                #Tutorial here: https://github.com/SlicerDMRI/whitematteranalysis/blob/master/doc/subject-specific-tractography-parcellation.md
                #To see the help file, type python `/opt/quarantine/whitematteranalysis/2018-07-19/build/bin/SCRIPTNAME.py` -h (uses argparse)
                #Note: to visualize .jpg images and share via Rpubs, will need to downsample. I have used ImageMagick: `mogrify -strip -interlace Plane -gaussian-blur 0.05 -quality 75% *.jpg`
+               
+#File organization: 
+#               Note also that some of the wma QC scripts appear to want input files in a flat directory, whereas others assume a stacked/directory structure.
+#               To accomodate this without complicating the code too much, I've made two copies of the input files: one flat, one stacked
+#               The flat files are in the original /projects/ncalarco/thesis/Slicer/SPINS/data/07_vtk directory
+#               The stacked files have are in /projects/ncalarco/thesis/Slicer/SPINS/data/10_QC/QC_00_rawVTK
+#               They were made simply by copying the 07_vtk, and then creating an eponymous directory for each file: 
+#               `for x in ./*.vtk; do; mkdir "${x%.*}" && mv "$x" "${x%.*}"; done`
 ####################################################################################
 
 #SBATCH --array=18268
