@@ -97,7 +97,7 @@ done
 
 for subject in $sublist; do
 wm_quality_control_tractography.py \
-  $inputfolder/08_registered/02_FiberClustering/InitialClusters/${subject}_eddy_fixed_SlicerTractography_reg/ \ 
+  $inputfolder/08_registered/02_FiberClustering/InitialClusters/${subject}_SlicerTractography_reg/ \ 
   $outputfolder/QC_04_clusterFromAtlas/${subject}
 done
   
@@ -111,7 +111,7 @@ done
 
 for subject in $sublist; do
 wm_quality_control_tractography.py \
-  $inputfolder/08_registered/02_FiberClustering/OutlierRemovedClusters/${subject}_eddy_fixed_SlicerTractography_reg_outlier_removed/ \
+  $inputfolder/08_registered/02_FiberClustering/OutlierRemovedClusters/${subject}_SlicerTractography_reg_outlier_removed/ \
   $outputfolder/QC_05_noOutliers/${subject}
 done
   
@@ -125,6 +125,6 @@ done
 
 for subject in $sublist; do
 wm_quality_control_tractography.py \
-  $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \ 
+  $inputfolder/08_registered/03_AnatomicalTracts/${subject}/ \
   $outputfolder/QC_06_anatomicalTracts
 done 
